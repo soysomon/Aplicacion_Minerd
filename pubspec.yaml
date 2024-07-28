@@ -10,24 +10,26 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_map: ^4.0.0
+  latlong2: ^0.8.1
+  provider: ^6.1.2
+  permission_handler: ^11.3.1
+  flutter_sound: ^9.1.11
+  shared_preferences: ^2.0.6
+  http: ^0.13.6
+  google_maps_flutter: ^2.6.0
+  geolocator: ^12.0.0
+  path_provider: ^2.0.7
+  image_picker: ^1.1.2
+  url_launcher: ^6.0.20
+  cupertino_icons: ^1.0.6
   sqflite: ^2.0.0+4
   path: ^1.8.0
-  cupertino_icons: ^1.0.6
-  flutter_sound:  ^9.1.11
-  permission_handler: ^11.3.1  # Versión más reciente disponible
-  provider: ^6.1.2  # Sin cambios, ya es la más reciente
-  shared_preferences: ^2.0.6  # Sin cambios, ya es la más reciente
-  http: ^1.2.2  # Versión más reciente disponible
-  google_maps_flutter: ^2.6.0  # Versión más compatible
-  geolocator: ^12.0.0  # Versión más reciente disponible
-  path_provider: ^2.0.7  # Sin cambios, ya es la más reciente
-  image_picker: ^1.1.2  # Versión más reciente disponible
-  url_launcher: ^6.0.20  # Sin cambios, ya es la más reciente
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0  # Versión más reciente disponible
+  flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true
