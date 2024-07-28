@@ -4,6 +4,7 @@ import 'incident_list_screen.dart';
 import 'register_visit_screen.dart';
 import 'map_screen.dart';
 import 'visit_list_screen.dart';
+import 'news_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -57,6 +58,19 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 20),
             _buildMenuItem(
               context,
+              icon: Icons.map,
+              label: 'Mapa de Visitas',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => MapScreen(),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 20),
+            _buildMenuItem(
+              context,
               icon: Icons.list_alt,
               label: 'Lista de Visitas',
               onPressed: () {
@@ -70,12 +84,12 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 20),
             _buildMenuItem(
               context,
-              icon: Icons.map,
-              label: 'Mapa de Visitas',
+              icon: Icons.newspaper,
+              label: 'Noticias',
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => MapScreen(),
+                    builder: (context) => NewsScreen(),
                   ),
                 );
               },
