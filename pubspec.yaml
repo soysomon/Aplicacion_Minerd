@@ -1,0 +1,37 @@
+name: aplicacion_minerd
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite: ^2.0.0+4
+  path: ^1.8.0
+  cupertino_icons: ^1.0.6
+  flutter_sound:  ^9.1.11
+  permission_handler: ^11.3.1  # Versión más reciente disponible
+  provider: ^6.1.2  # Sin cambios, ya es la más reciente
+  shared_preferences: ^2.0.6  # Sin cambios, ya es la más reciente
+  http: ^1.2.2  # Versión más reciente disponible
+  google_maps_flutter: ^2.6.0  # Versión más compatible
+  geolocator: ^12.0.0  # Versión más reciente disponible
+  path_provider: ^2.0.7  # Sin cambios, ya es la más reciente
+  image_picker: ^1.1.2  # Versión más reciente disponible
+  url_launcher: ^6.0.20  # Sin cambios, ya es la más reciente
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0  # Versión más reciente disponible
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/  # Directorio para imágenes
+    - assets/audio/  # Directorio para archivos de audio
