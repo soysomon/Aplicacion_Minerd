@@ -1,134 +1,144 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'register_incident_screen.dart';
 import 'incident_list_screen.dart';
 import 'register_visit_screen.dart';
 import 'map_screen.dart';
 import 'visit_list_screen.dart';
 import 'news_screen.dart';
+import 'profile_screen.dart';
+import 'settings_screen.dart';
+import '../providers/profile_provider.dart';
 
 class HomeScreen extends StatelessWidget {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Aplicación MINERD'),
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/custom_icon.svg',
+            width: 40,
+            height: 40,
+          ),
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+        ),
       ),
-      body: Center(
+      drawer: Drawer(
         child: ListView(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.zero,
           children: [
-            _buildMenuItem(
-              context,
-              icon: Icons.add,
-              label: 'Agregar Incidencia',
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => RegisterIncidentScreen(),
+            Consumer<ProfileProvider>(
+              builder: (context, profileProvider, child) {
+                return UserAccountsDrawerHeader(
+                  accountName: Text(profileProvider.name),
+                  accountEmail: Text(profileProvider.email),
+                  currentAccountPicture: CircleAvatar(
+                    backgroundImage: profileProvider.profileImage.isNotEmpty
+                        ? FileImage(File(profileProvider.profileImage))
+                        : AssetImage('assets/images/profile_placeholder.png') as ImageProvider,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/profile_placeholder.png'),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 );
               },
             ),
-            SizedBox(height: 20),
-            _buildMenuItem(
-              context,
-              icon: Icons.list,
-              label: 'Lista de Incidencias',
-              onPressed: () {
+            ListTile(
+              leading: Icon(Icons.add),
+              title: Text('Agregar Incidencia'),
+              onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => IncidentListScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => RegisterIncidentScreen()),
                 );
               },
             ),
-            SizedBox(height: 20),
-            _buildMenuItem(
-              context,
-              icon: Icons.school,
-              label: 'Registrar Visita',
-              onPressed: () {
+            ListTile(
+              leading: Icon(Icons.list),
+              title: Text('Lista de Incidencias'),
+              onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => RegisterVisitScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => IncidentListScreen()),
                 );
               },
             ),
-            SizedBox(height: 20),
-            _buildMenuItem(
-              context,
-              icon: Icons.map,
-              label: 'Mapa de Visitas',
-              onPressed: () {
+            ListTile(
+              leading: Icon(Icons.school),
+              title: Text('Registrar Visita'),
+              onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => MapScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => RegisterVisitScreen()),
                 );
               },
             ),
-            SizedBox(height: 20),
-            _buildMenuItem(
-              context,
-              icon: Icons.list_alt,
-              label: 'Lista de Visitas',
-              onPressed: () {
+            ListTile(
+              leading: Icon(Icons.map),
+              title: Text('Mapa de Visitas'),
+              onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => VisitListScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => MapScreen()),
                 );
               },
             ),
-            SizedBox(height: 20),
-            _buildMenuItem(
-              context,
-              icon: Icons.newspaper,
-              label: 'Noticias',
-              onPressed: () {
+            ListTile(
+              leading: Icon(Icons.list_alt),
+              title: Text('Lista de Visitas'),
+              onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => NewsScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => VisitListScreen()),
                 );
               },
             ),
-            SizedBox(height: 20),
-            _buildMenuItem(
-              context,
-              icon: Icons.info,
-              label: 'Acerca de',
-              onPressed: () {
+            ListTile(
+              leading: Icon(Icons.newspaper),
+              title: Text('Noticias'),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => NewsScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.info),
+              title: Text('Acerca de'),
+              onTap: () {
                 // Reemplaza con la ruta correspondiente cuando la pantalla esté creada
               },
             ),
-            SizedBox(height: 20),
-            _buildMenuItem(
-              context,
-              icon: Icons.settings,
-              label: 'Configuración',
-              onPressed: () {
-                // Reemplaza con la ruta correspondiente cuando la pantalla esté creada
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Configuración'),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => SettingsScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+              onTap: () {
+                // Implement logout functionality
               },
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildMenuItem(BuildContext context, {required IconData icon, required String label, required VoidCallback onPressed}) {
-    return ListTile(
-      leading: Icon(icon, size: 28, color: Colors.black),
-      title: Text(
-        label,
-        style: TextStyle(fontSize: 18, color: Colors.black),
-      ),
-      onTap: onPressed,
-      tileColor: Colors.grey[200],
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+      body: Center(
+        child: Text('Welcome to Home Page'),
       ),
     );
   }

@@ -18,6 +18,7 @@ class IncidentProvider with ChangeNotifier {
     notifyListeners();
   }
 
+
   Future<void> updateIncident(Incident incident) async {
     await IncidentDatabase.instance.update(incident);
     final index = _incidents.indexWhere((i) => i.id == incident.id);
@@ -33,3 +34,4 @@ class IncidentProvider with ChangeNotifier {
     notifyListeners();
   }
 }
+

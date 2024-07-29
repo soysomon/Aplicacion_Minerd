@@ -27,9 +27,9 @@ class VisitProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteVisit(int id) async {
-    await VisitDatabase.instance.delete(id);
-    _visits.removeWhere((visit) => visit.id == id);
+  Future<void> deleteAllVisits() async {
+    await VisitDatabase.instance.deleteAllVisits();
+    _visits.clear();
     notifyListeners();
   }
 }

@@ -46,6 +46,9 @@ class _VisitDetailScreenState extends State<VisitDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (widget.visit.photoPath.isNotEmpty)
+              Image.file(File(widget.visit.photoPath)),
+            SizedBox(height: 10),
             Text('Cédula del Director: ${widget.visit.directorId}', style: TextStyle(fontSize: 18)),
             SizedBox(height: 10),
             Text('Código del Centro: ${widget.visit.centerCode}', style: TextStyle(fontSize: 18)),
@@ -62,16 +65,6 @@ class _VisitDetailScreenState extends State<VisitDetailScreen> {
             SizedBox(height: 10),
             Text('Longitud: ${widget.visit.longitude}', style: TextStyle(fontSize: 18)),
             SizedBox(height: 10),
-            if (widget.visit.photoPath.isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Foto:', style: TextStyle(fontSize: 18)),
-                  SizedBox(height: 10),
-                  Image.file(File(widget.visit.photoPath), height: 200, width: 200),
-                  SizedBox(height: 10),
-                ],
-              ),
             if (widget.visit.audioPath.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

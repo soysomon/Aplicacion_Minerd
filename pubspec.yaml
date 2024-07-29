@@ -25,6 +25,13 @@ dependencies:
   sqflite: ^2.0.0+4
   path: ^1.8.0
   carousel_slider: ^4.0.0
+  vibration: ^1.7.4
+  video_player: ^2.2.11
+  flutter_svg: ^1.0.3
+
+
+
+
 
 dev_dependencies:
   flutter_test:
@@ -35,5 +42,9 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/  # Directorio para imágenes
-    - assets/audio/  # Directorio para archivos de audio
+    - assets/images/profile_placeholder.png
+    - assets/images/profile_placeholde.png
+    - assets/audio/
+    - assets/videos/delete.mp4
+    - assets/videos/list_unfine.mp4
+    - assets/icons/custom_icon.svg

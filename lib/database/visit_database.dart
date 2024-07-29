@@ -93,15 +93,11 @@ class VisitDatabase {
     );
   }
 
-  Future<int> delete(int id) async {
+  Future<void> deleteAllVisits() async {
     final db = await instance.database;
-
-    return await db.delete(
-      tableVisits,
-      where: '${VisitFields.id} = ?',
-      whereArgs: [id],
-    );
+    await db.delete(tableVisits);
   }
+
 
   Future close() async {
     final db = await instance.database;
