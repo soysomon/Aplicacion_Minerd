@@ -4,7 +4,6 @@ import 'security_screen.dart';
 import 'about_screen.dart';
 import 'home_screen.dart';
 
-
 class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -128,34 +127,6 @@ class SettingsScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class SecurityScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Seguridad'),
-      ),
-      body: Center(
-        child: Text('Pantalla de Seguridad'),
-      ),
-    );
-  }
-}
-
-class AboutScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Acerca de'),
-      ),
-      body: Center(
-        child: Text('Pantalla Acerca de'),
       ),
     );
   }

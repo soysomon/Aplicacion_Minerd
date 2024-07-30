@@ -81,7 +81,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 aspectRatio: _controller.value.aspectRatio,
                 child: VideoPlayer(_controller),
               ),
-            ),
+            )
+          else
+            Center(child: CircularProgressIndicator()), // Mostrar un indicador de carga mientras el video se inicializa
           Positioned(
             top: 50,
             child: Text(

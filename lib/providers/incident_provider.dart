@@ -34,4 +34,3 @@ class IncidentProvider with ChangeNotifier {
     notifyListeners();
   }
 }
-

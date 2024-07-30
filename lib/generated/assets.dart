@@ -2,6 +2,7 @@
 class Assets {
   Assets._();
 
+  static const String assetsIconsCustomIcon = 'assets/icons/custom_icon.svg';
   static const String assetsImagesProfilePlaceholde = 'assets/images/profile_placeholde.png';
   static const String assetsImagesProfilePlaceholder = 'assets/images/profile_placeholder.png';
   static const String assetsVideosDelete = 'assets/videos/delete.mp4';

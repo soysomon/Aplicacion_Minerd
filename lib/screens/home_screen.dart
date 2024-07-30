@@ -1,8 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'login_screen.dart';
 import 'register_incident_screen.dart';
 import 'incident_list_screen.dart';
 import 'register_visit_screen.dart';
@@ -12,6 +12,7 @@ import 'news_screen.dart';
 import 'profile_screen.dart';
 import 'settings_screen.dart';
 import '../providers/profile_provider.dart';
+import '../providers/user_provider.dart';
 
 class HomeScreen extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -37,11 +38,11 @@ class HomeScreen extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            Consumer<ProfileProvider>(
-              builder: (context, profileProvider, child) {
+            Consumer2<ProfileProvider, UserProvider>(
+              builder: (context, profileProvider, userProvider, child) {
                 return UserAccountsDrawerHeader(
-                  accountName: Text(profileProvider.name),
-                  accountEmail: Text(profileProvider.email),
+                  accountName: Text(userProvider.user.name),
+                  accountEmail: Text(userProvider.user.lastName),
                   currentAccountPicture: CircleAvatar(
                     backgroundImage: profileProvider.profileImage.isNotEmpty
                         ? FileImage(File(profileProvider.profileImage))
@@ -131,7 +132,10 @@ class HomeScreen extends StatelessWidget {
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () {
-                // Implement logout functionality
+                // Implementar funcionalidad de logout
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
               },
             ),
           ],
