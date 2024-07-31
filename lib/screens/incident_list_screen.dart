@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fan_floating_menu/fan_floating_menu.dart';
 import 'incident_detail_screen.dart';
 import '../models/incident.dart';
 import '../database/incident_database.dart';
+import 'register_visit_screen.dart';
+import 'register_incident_screen.dart';
 
 class IncidentListScreen extends StatefulWidget {
   @override
@@ -60,9 +63,36 @@ class _IncidentListScreenState extends State<IncidentListScreen> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _refreshIncidents,
-        child: Icon(Icons.refresh),
+      floatingActionButton: FanFloatingMenu(
+        menuItems: [
+          FanMenuItem(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => RegisterVisitScreen()),
+              );
+            },
+            icon: Icons.person_add_alt_1_rounded,
+            title: 'Registrar Visita',
+          ),
+          FanMenuItem(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => RegisterIncidentScreen()),
+              );
+            },
+            icon: Icons.add_alert_rounded,
+            title: 'Registrar Incidencia',
+          ),
+          FanMenuItem(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => IncidentListScreen()),
+              );
+            },
+            icon: Icons.list_alt_rounded,
+            title: 'Lista de Incidencias',
+          ),
+        ],
       ),
     );
   }

@@ -30,6 +30,14 @@ dependencies:
   flutter_svg: ^1.0.3
   concentric_transition: ^1.0.1+1
   google_fonts: ^4.0.3
+  font_awesome_flutter: ^10.1.0
+  animations: ^2.0.0
+  fan_floating_menu: any
+  awesome_drawer_bar: any
+  flutter_zoom_drawer: ^2.1.0
+
+
+
 
 
 
@@ -47,6 +55,9 @@ flutter:
   assets:
     - assets/images/profile_placeholder.png
     - assets/images/profile_placeholde.png
+    - assets/images/educacion.png
+    - assets/images/prueba.png
+    - assets/images/docente.png
     - assets/audio/
     - assets/videos/delete.mp4
     - assets/videos/list_unfine.mp4
