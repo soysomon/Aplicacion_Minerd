@@ -1,6 +1,8 @@
-import 'package:aplicacion_minerd/providers/incident_provider.dart';
+import 'package:aplicacion_minerd/providers/center_provider.dart';
+import 'package:aplicacion_minerd/screens/register_incident_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'providers/incident_provider.dart';
 import 'providers/visit_provider.dart';
 import 'providers/news_provider.dart';
 import 'providers/profile_provider.dart';
@@ -12,13 +14,12 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => CenterProvider()),
         ChangeNotifierProvider(create: (_) => VisitProvider()),
         ChangeNotifierProvider(create: (_) => NewsProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()), // Proveedor de usuario
         ChangeNotifierProvider(create: (_) => IncidentProvider()),
-        // Proveedor de usuario
-
       ],
       child: MyApp(),
     ),
@@ -37,7 +38,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginScreen(),
         '/home': (context) => HomeScreen(),
-      },
+     },
+     // home: RegisterIncidentScreen(),
+
     );
   }
 }

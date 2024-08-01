@@ -35,6 +35,20 @@ dependencies:
   fan_floating_menu: any
   awesome_drawer_bar: any
   flutter_zoom_drawer: ^2.1.0
+  flutter_bloc: ^8.0.0
+
+
+  auto_size_text: 3.0.0
+  cached_network_image: 3.2.1
+  flutter_animate: 4.1.1+1
+  from_css_color: 2.0.0
+  go_router: ^7.1.1
+  intl: 0.18.1
+  json_path: 0.6.2
+  dart_ipify: ^1.1.1
+  json_annotation: ^4.8.1
+  dio: ^5.4.0
+  retrofit: ^4.0.3
 
 
 
@@ -62,3 +76,4 @@ flutter:
     - assets/videos/delete.mp4
     - assets/videos/list_unfine.mp4
     - assets/icons/custom_icon.svg
+    - assets/icons/icon-menu.svg

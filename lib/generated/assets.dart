@@ -3,6 +3,7 @@ class Assets {
   Assets._();
 
   static const String assetsIconsCustomIcon = 'assets/icons/custom_icon.svg';
+  static const String assetsImagesDocente = 'assets/images/docente.png';
   static const String assetsImagesEducacion = 'assets/images/educacion.png';
   static const String assetsImagesProfilePlaceholde = 'assets/images/profile_placeholde.png';
   static const String assetsImagesProfilePlaceholder = 'assets/images/profile_placeholder.png';
@@ -10,7 +11,8 @@ class Assets {
   static const String assetsVideosDelete = 'assets/videos/delete.mp4';
   static const String assetsVideosListUnfine = 'assets/videos/list_unfine.mp4';
   static const String iconsCustomIcon = 'assets/icons/custom_icon.svg';
-  static const String imagesDoncete = 'assets/images/docente.png';
+  static const String iconsIconMenu = 'assets/icons/icon-menu.svg';
+  static const String imagesDocente = 'assets/images/docente.png';
   static const String imagesEducacion = 'assets/images/educacion.png';
   static const String imagesProfilePlaceholde = 'assets/images/profile_placeholde.png';
   static const String imagesProfilePlaceholder = 'assets/images/profile_placeholder.png';

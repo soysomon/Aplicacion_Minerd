@@ -16,9 +16,9 @@ class HomeScreen extends StatelessWidget {
           title: Text('Aplicación MINERD'),
           leading: IconButton(
             icon: SvgPicture.asset(
-              'assets/icons/custom_icon.svg',
-              width: 40,
-              height: 40,
+              'assets/icons/icon-menu.svg',
+              width: 25,
+              height: 25,
             ),
             onPressed: () {
               _drawerController.toggle?.call();

@@ -112,6 +112,7 @@ class DrawerMenuScreen extends StatelessWidget {
               );
             },
           ),
+
           ListTile(
             leading: Icon(Icons.logout, color: Colors.white),
             title: Text('Logout', style: TextStyle(color: Colors.white)),
