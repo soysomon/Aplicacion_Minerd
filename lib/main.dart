@@ -1,25 +1,29 @@
-import 'package:aplicacion_minerd/providers/center_provider.dart';
-import 'package:aplicacion_minerd/screens/register_incident_screen.dart';
+import 'package:aplicacion_minerd/providers/registro_api.dart';
+import 'package:aplicacion_minerd/screens/forgot_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/incident_provider.dart';
 import 'providers/visit_provider.dart';
 import 'providers/news_provider.dart';
 import 'providers/profile_provider.dart';
-import 'providers/user_provider.dart'; // Agregar el proveedor de usuario
+import 'providers/user_provider.dart';
+import 'providers/registro_api.dart'; // Agregar el proveedor de registro
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/register_screen.dart'; // Importar la pantalla de registro
+import 'screens/change_password_screen.dart'; // Importar la pantalla de cambio de clave
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => CenterProvider()),
         ChangeNotifierProvider(create: (_) => VisitProvider()),
         ChangeNotifierProvider(create: (_) => NewsProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
-        ChangeNotifierProvider(create: (_) => UserProvider()), // Proveedor de usuario
+        ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => IncidentProvider()),
+        Provider(create: (_) => RegistroApi()), // Proveedor de registro
+
       ],
       child: MyApp(),
     ),
@@ -38,9 +42,11 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginScreen(),
         '/home': (context) => HomeScreen(),
-     },
-     // home: RegisterIncidentScreen(),
+        '/register': (context) => RegisterScreen(),
+        '/forgot-password': (context) => ForgotPasswordScreen(),
 
+        '/change-password': (context) => ChangePasswordScreen(),
+      },
     );
   }
 }

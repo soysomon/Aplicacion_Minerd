@@ -1,6 +1,9 @@
+// lib/database/incident_database.dart
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/incident.dart';
+import 'incident_fields.dart';
 
 class IncidentDatabase {
   static final IncidentDatabase instance = IncidentDatabase._init();
@@ -11,6 +14,7 @@ class IncidentDatabase {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
+
     _database = await _initDB('incidents.db');
     return _database!;
   }
@@ -19,11 +23,7 @@ class IncidentDatabase {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _createDB,
-    );
+    return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
   Future _createDB(Database db, int version) async {
@@ -45,43 +45,26 @@ class IncidentDatabase {
     ''');
   }
 
+  Future<void> deleteAll() async {
+    final db = await instance.database;
+    await db.delete(tableIncidents);
+  }
+
   Future<Incident> create(Incident incident) async {
     final db = await instance.database;
-
     final id = await db.insert(tableIncidents, incident.toJson());
     return incident.copy(id: id);
   }
 
-  Future<Incident?> readIncident(int id) async {
-    final db = await instance.database;
-
-    final maps = await db.query(
-      tableIncidents,
-      columns: IncidentFields.values,
-      where: '${IncidentFields.id} = ?',
-      whereArgs: [id],
-    );
-
-    if (maps.isNotEmpty) {
-      return Incident.fromJson(maps.first);
-    } else {
-      return null;
-    }
-  }
-
   Future<List<Incident>> readAllIncidents() async {
     final db = await instance.database;
-
-    final orderBy = '${IncidentFields.date} ASC';
-
+    const orderBy = '${IncidentFields.date} ASC';
     final result = await db.query(tableIncidents, orderBy: orderBy);
-
     return result.map((json) => Incident.fromJson(json)).toList();
   }
 
   Future<int> update(Incident incident) async {
     final db = await instance.database;
-
     return db.update(
       tableIncidents,
       incident.toJson(),
@@ -92,8 +75,7 @@ class IncidentDatabase {
 
   Future<int> delete(int id) async {
     final db = await instance.database;
-
-    return await db.delete(
+    return db.delete(
       tableIncidents,
       where: '${IncidentFields.id} = ?',
       whereArgs: [id],
@@ -102,7 +84,6 @@ class IncidentDatabase {
 
   Future close() async {
     final db = await instance.database;
-
     db.close();
   }
 }

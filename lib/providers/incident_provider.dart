@@ -18,7 +18,6 @@ class IncidentProvider with ChangeNotifier {
     notifyListeners();
   }
 
-
   Future<void> updateIncident(Incident incident) async {
     await IncidentDatabase.instance.update(incident);
     final index = _incidents.indexWhere((i) => i.id == incident.id);
@@ -31,6 +30,12 @@ class IncidentProvider with ChangeNotifier {
   Future<void> deleteIncident(int id) async {
     await IncidentDatabase.instance.delete(id);
     _incidents.removeWhere((i) => i.id == id);
+    notifyListeners();
+  }
+
+  Future<void> deleteAllIncidents() async {
+    await IncidentDatabase.instance.deleteAll();
+    _incidents.clear();
     notifyListeners();
   }
 }

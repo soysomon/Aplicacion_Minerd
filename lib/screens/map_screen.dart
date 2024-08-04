@@ -54,7 +54,8 @@ class MapScreen extends StatelessWidget {
                         return AlertDialog(
                           title: Text('Información de la Visita'),
                           content: Text(
-                              'Código del Centro: ${visit.centerCode}\nMotivo: ${visit.reason}\nComentario: ${visit.comment}\nUbicación: ${visit.latitude}, ${visit.longitude}'),
+                            'Código del Centro: ${visit.centerCode}\nMotivo: ${visit.reason}\nComentario: ${visit.comment}\nUbicación: ${visit.latitude}, ${visit.longitude}',
+                          ),
                           actions: [
                             TextButton(
                               onPressed: () {

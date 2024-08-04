@@ -1,11 +1,17 @@
+import 'package:aplicacion_minerd/screens/register_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/user.dart';
 import '../providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Importar shared_preferences
+import '../providers/registro_api.dart';
+import 'register_visit_screen.dart'; // Asegúrate de que este archivo exista
+import 'change_password_screen.dart';
+import 'forgot_password_screen.dart'; // Nueva importación
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -13,42 +19,72 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _cedulaController = TextEditingController();
+  final _claveController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
+    _cedulaController.dispose();
+    _claveController.dispose();
     super.dispose();
   }
 
-  void _login() {
-    // Credenciales válidas
-    String validUsername = 'user';
-    String validPassword = 'admin';
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+    });
 
-    String username = _usernameController.text;
-    String password = _passwordController.text;
+    try {
+      String cedula = _cedulaController.text;
+      String clave = _claveController.text;
 
-    if (username == validUsername && password == validPassword) {
-      final user = User(
-        id: 1,
-        name: 'John',
-        lastName: 'Doe',
-        registrationNumber: '123456',
-        photoUrl: 'https://example.com/photo.jpg',
+      final response = await Provider.of<RegistroApi>(context, listen: false).iniciarSesion(
+        cedula: cedula,
+        clave: clave,
       );
 
-      Provider.of<UserProvider>(context, listen: false).setUser(user);
+      print('Response: $response'); // Agregar impresión para depuración
 
-      // Navigate to home screen
-      Navigator.of(context).pushReplacementNamed('/home');
-    } else {
-      // Mostrar mensaje de error
+      if (response['exito']) {
+        final datos = response['datos'];
+        if (datos == null || datos['id'] == null || datos['nombre'] == null || datos['apellido'] == null || datos['correo'] == null || datos['telefono'] == null || datos['fecha_nacimiento'] == null || datos['token'] == null) {
+          print('Datos incompletos: $datos');
+          throw Exception('Datos incompletos en la respuesta');
+        }
+
+        final user = User(
+          id: int.parse(datos['id'].toString()),
+          name: datos['nombre'].toString(),
+          lastName: datos['apellido'].toString(),
+          email: datos['correo'].toString(),
+          phone: datos['telefono'].toString(),
+          birthDate: datos['fecha_nacimiento'].toString(),
+          token: datos['token'].toString(),
+        );
+
+        Provider.of<UserProvider>(context, listen: false).setUser(user);
+
+        // Guardar el token en SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', user.token);
+
+        // Navigate to home screen
+        Navigator.of(context).pushReplacementNamed('/home');
+      } else {
+        // Mostrar mensaje de error
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(response['mensaje']),
+        ));
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Credenciales inválidas'),
+        content: Text('Error: $e'),
       ));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -152,9 +188,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                         children: [
                           TextField(
-                            controller: _usernameController,
+                            controller: _cedulaController,
                             decoration: InputDecoration(
-                              labelText: 'Email',
+                              labelText: 'Cédula',
                               labelStyle: GoogleFonts.dmSans(
                                 fontSize: 18,
                                 color: Colors.grey,
@@ -170,10 +206,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: 30),
                           TextField(
-                            controller: _passwordController,
+                            controller: _claveController,
                             obscureText: true,
                             decoration: InputDecoration(
-                              labelText: 'Password',
+                              labelText: 'Clave',
                               labelStyle: GoogleFonts.dmSans(
                                 fontSize: 18,
                                 color: Colors.grey,
@@ -187,11 +223,29 @@ class _LoginScreenState extends State<LoginScreen> {
                               contentPadding: EdgeInsets.symmetric(vertical: 25, horizontal: 20),
                             ),
                           ),
+                          SizedBox(height: 10),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                                );
+                              },
+                              child: Text(
+                                '¿Olvidaste tu contraseña?',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.blue,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
                           SizedBox(height: 30),
                           Container(
-                            width: MediaQuery.of(context).size.width * 0.8, // Ajusta este valor para controlar el ancho del botón
+                            width: MediaQuery.of(context).size.width * 0.8,
                             child: ElevatedButton(
-                              onPressed: _login,
+                              onPressed: _isLoading ? null : _login,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.black,
                                 shape: RoundedRectangleBorder(
@@ -205,7 +259,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
-                                child: Text(
+                                child: _isLoading
+                                    ? CircularProgressIndicator(color: Colors.white)
+                                    : Text(
                                   'Login',
                                   style: GoogleFonts.dmSans(
                                     fontSize: 18,
@@ -216,43 +272,56 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 20), // Espacio entre el botón y los iconos
+                          SizedBox(height: 20),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               IconButton(
                                 icon: FaIcon(FontAwesomeIcons.facebook, color: Colors.black),
                                 onPressed: () {
-                                  // Navegar a Facebook
                                   launchUrl('https://www.facebook.com/ministerioeducacionrd');
                                 },
                               ),
-                              SizedBox(width: 20), // Espacio entre los iconos
+                              SizedBox(width: 20),
                               IconButton(
                                 icon: FaIcon(FontAwesomeIcons.instagram, color: Colors.black),
                                 onPressed: () {
-                                  // Navegar a Instagram
                                   launchUrl('https://www.instagram.com/educacionrd/');
                                 },
                               ),
-                              SizedBox(width: 20), // Espacio entre los iconos
+                              SizedBox(width: 20),
                               IconButton(
                                 icon: FaIcon(FontAwesomeIcons.globe, color: Colors.black),
                                 onPressed: () {
-                                  // Navegar a la web
                                   launchUrl('https://www.ministeriodeeducacion.gob.do/');
                                 },
                               ),
                             ],
                           ),
-
-                          SizedBox(height: 80),
+                          SizedBox(height: 20),
                           TextButton(
                             onPressed: () {
-                              // Acción para registrarse
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (context) => RegisterScreen()),
+                              );
                             },
                             child: Text(
-                              "Don't have any account? Sign Up",
+                              "¿No tiene cuenta? Regístrese",
+                              style: GoogleFonts.poppins(
+                                color: Colors.black,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
+                              );
+                            },
+                            child: Text(
+                              "¿Ha olvidado su contraseña? Cámbiela aquí",
                               style: GoogleFonts.poppins(
                                 color: Colors.black,
                                 decoration: TextDecoration.underline,

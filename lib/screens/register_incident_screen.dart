@@ -6,6 +6,7 @@ import '../models/incident.dart';
 import '../providers/incident_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'centro_api.dart';
 
 class RegisterIncidentScreen extends StatefulWidget {
   @override
@@ -14,30 +15,34 @@ class RegisterIncidentScreen extends StatefulWidget {
 
 class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
   final _titleController = TextEditingController();
-  final _centerController = TextEditingController();
-  final _regionalController = TextEditingController();
   final _districtController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _searchController = TextEditingController();
   DateTime? _selectedDate;
   List<String> _photoPaths = [];
   String _audioPath = '';
   FlutterSoundRecorder? _audioRecorder;
   bool _isRecording = false;
+  List<Centro> _centros = [];
+  List<Centro> _filteredCentros = [];
+  Centro? _selectedCentro;
+  String? _selectedRegional;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _audioRecorder = FlutterSoundRecorder();
     _openAudioSession();
+    _searchController.addListener(_filterCentros);
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    _centerController.dispose();
-    _regionalController.dispose();
     _districtController.dispose();
     _descriptionController.dispose();
+    _searchController.dispose();
     _closeAudioSession();
     super.dispose();
   }
@@ -93,10 +98,48 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
     }
   }
 
+  Future<void> _fetchCentros() async {
+    if (_selectedRegional == null || _selectedRegional!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Por favor seleccione una regional'),
+      ));
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      List<Centro> centros = await CentroApi().fetchCentros(regional: _selectedRegional!);
+      setState(() {
+        _centros = centros;
+        _filteredCentros = centros;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error al cargar centros: $e'),
+      ));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _filterCentros() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredCentros = _centros.where((centro) {
+        return centro.nombre.toLowerCase().startsWith(query);
+      }).toList();
+    });
+  }
+
   Future<void> _saveIncident() async {
     if (_titleController.text.isEmpty ||
-        _centerController.text.isEmpty ||
-        _regionalController.text.isEmpty ||
+        _selectedCentro == null ||
+        _selectedRegional == null ||
         _districtController.text.isEmpty ||
         _descriptionController.text.isEmpty ||
         _selectedDate == null ||
@@ -110,8 +153,8 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
 
     final incident = Incident(
       title: _titleController.text,
-      center: _centerController.text,
-      regional: _regionalController.text,
+      center: _selectedCentro!.nombre,
+      regional: _selectedRegional!,
       district: _districtController.text,
       date: _selectedDate.toString(),
       description: _descriptionController.text,
@@ -146,17 +189,61 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
               controller: _titleController,
               decoration: InputDecoration(labelText: 'Título'),
             ),
-            TextField(
-              controller: _centerController,
-              decoration: InputDecoration(labelText: 'Centro'),
+            DropdownButton<String>(
+              hint: Text('Seleccione una regional'),
+              value: _selectedRegional,
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedRegional = newValue;
+                  _fetchCentros();
+                });
+              },
+              items: List.generate(18, (index) {
+                String regional = (index + 1).toString().padLeft(2, '0');
+                return DropdownMenuItem<String>(
+                  value: regional,
+                  child: Text('Regional $regional'),
+                );
+              }),
+              isExpanded: true,
             ),
-            TextField(
-              controller: _regionalController,
-              decoration: InputDecoration(labelText: 'Regional'),
-            ),
+            if (_isLoading)
+              CircularProgressIndicator(),
+            if (!_isLoading && _centros.isNotEmpty)
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButton<Centro>(
+                            hint: Text('Seleccione un centro'),
+                            value: _selectedCentro,
+                            onChanged: (Centro? newValue) {
+                              setState(() {
+                                _selectedCentro = newValue;
+                                _districtController.text = newValue?.distrito ?? '';
+                              });
+                            },
+                            items: _filteredCentros.map((Centro centro) {
+                              return DropdownMenuItem<Centro>(
+                                value: centro,
+                                child: Text(centro.nombre),
+                              );
+                            }).toList(),
+                            isExpanded: true,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             TextField(
               controller: _districtController,
               decoration: InputDecoration(labelText: 'Distrito'),
+              readOnly: true,
             ),
             TextField(
               controller: _descriptionController,
@@ -180,16 +267,14 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
               ],
             ),
             SizedBox(height: 10),
-            Row(
+            Wrap(
+              spacing: 10.0,
+              runSpacing: 10.0,
               children: [
-                Expanded(
-                  child: Text('Fotos seleccionadas: ${_photoPaths.length}'),
-                ),
                 ElevatedButton(
                   onPressed: () => _pickImage(ImageSource.gallery),
                   child: Text('Seleccionar Foto'),
                 ),
-                SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: () => _pickImage(ImageSource.camera),
                   child: Text('Tomar Foto'),
@@ -197,7 +282,9 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
               ],
             ),
             SizedBox(height: 10),
-            Column(
+            Wrap(
+              spacing: 10.0,
+              runSpacing: 10.0,
               children: _photoPaths.map((path) {
                 return Image.file(File(path), height: 100, width: 100);
               }).toList(),

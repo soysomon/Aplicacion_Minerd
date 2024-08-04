@@ -1,127 +1,85 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-import '../models/visit.dart';
+// lib/models/visit.dart
 
-class VisitDatabase {
-  static final VisitDatabase instance = VisitDatabase._init();
+class Visit {
+  final int id;
+  final String directorId;
+  final String centerCode;
+  final String reason;
+  final String photoPath;
+  final String audioPath;
+  final double latitude;
+  final double longitude;
+  final String date;
+  final String time;
+  final String comment;
 
-  static Database? _database;
+  Visit({
+    required this.id,
+    required this.directorId,
+    required this.centerCode,
+    required this.reason,
+    required this.photoPath,
+    required this.audioPath,
+    required this.latitude,
+    required this.longitude,
+    required this.date,
+    required this.time,
+    required this.comment,
+  });
 
-  VisitDatabase._init();
+  factory Visit.fromJson(Map<String, dynamic> json) => Visit(
+    id: json['id'],
+    directorId: json['directorId'],
+    centerCode: json['centerCode'],
+    reason: json['reason'],
+    photoPath: json['photoPath'],
+    audioPath: json['audioPath'],
+    latitude: double.parse(json['latitude']),
+    longitude: double.parse(json['longitude']),
+    date: json['date'],
+    time: json['time'],
+    comment: json['comment'],
+  );
 
-  Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDB('visits.db');
-    return _database!;
-  }
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'directorId': directorId,
+    'centerCode': centerCode,
+    'reason': reason,
+    'photoPath': photoPath,
+    'audioPath': audioPath,
+    'latitude': latitude.toString(),
+    'longitude': longitude.toString(),
+    'date': date,
+    'time': time,
+    'comment': comment,
+  };
 
-  Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
-
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _createDB,
+  Visit copyWith({
+    int? id,
+    String? directorId,
+    String? centerCode,
+    String? reason,
+    String? photoPath,
+    String? audioPath,
+    double? latitude,
+    double? longitude,
+    String? date,
+    String? time,
+    String? comment,
+  }) {
+    return Visit(
+      id: id ?? this.id,
+      directorId: directorId ?? this.directorId,
+      centerCode: centerCode ?? this.centerCode,
+      reason: reason ?? this.reason,
+      photoPath: photoPath ?? this.photoPath,
+      audioPath: audioPath ?? this.audioPath,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      date: date ?? this.date,
+      time: time ?? this.time,
+      comment: comment ?? this.comment,
     );
-  }
-
-  Future _createDB(Database db, int version) async {
-    const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    const textType = 'TEXT NOT NULL';
-    const doubleType = 'REAL NOT NULL';
-
-    await db.execute('''
-    CREATE TABLE $tableVisits ( 
-      ${VisitFields.id} $idType, 
-      ${VisitFields.directorId} $textType,
-      ${VisitFields.centerCode} $textType,
-      ${VisitFields.reason} $textType,
-      ${VisitFields.photoPath} $textType,
-      ${VisitFields.audioPath} $textType,
-      ${VisitFields.latitude} $doubleType,
-      ${VisitFields.longitude} $doubleType,
-      ${VisitFields.date} $textType,
-      ${VisitFields.time} $textType,
-      ${VisitFields.comment} $textType
-    )
-    ''');
-  }
-
-  Future<Visit> create(Visit visit) async {
-    final db = await instance.database;
-
-    final id = await db.insert(tableVisits, visit.toJson());
-    return visit.copy(id: id);
-  }
-
-  Future<Visit?> readVisit(int id) async {
-    final db = await instance.database;
-
-    final maps = await db.query(
-      tableVisits,
-      columns: VisitFields.values,
-      where: '${VisitFields.id} = ?',
-      whereArgs: [id],
-    );
-
-    if (maps.isNotEmpty) {
-      return Visit.fromJson(maps.first);
-    } else {
-      return null;
-    }
-  }
-
-  Future<List<Visit>> readAllVisits() async {
-    final db = await instance.database;
-
-    final orderBy = '${VisitFields.date} ASC';
-
-    final result = await db.query(tableVisits, orderBy: orderBy);
-
-    return result.map((json) => Visit.fromJson(json)).toList();
-  }
-
-  Future<int> update(Visit visit) async {
-    final db = await instance.database;
-
-    return db.update(
-      tableVisits,
-      visit.toJson(),
-      where: '${VisitFields.id} = ?',
-      whereArgs: [visit.id],
-    );
-  }
-
-  Future<void> deleteAllVisits() async {
-    final db = await instance.database;
-    await db.delete(tableVisits);
-  }
-
-
-  Future close() async {
-    final db = await instance.database;
-
-    db.close();
   }
 }
-
-class VisitFields {
-  static final List<String> values = [
-    id, directorId, centerCode, reason, photoPath, audioPath, latitude, longitude, date, time, comment
-  ];
-
-  static const String id = '_id';
-  static const String directorId = 'directorId';
-  static const String centerCode = 'centerCode';
-  static const String reason = 'reason';
-  static const String photoPath = 'photoPath';
-  static const String audioPath = 'audioPath';
-  static const String latitude = 'latitude';
-  static const String longitude = 'longitude';
-  static const String date = 'date';
-  static const String time = 'time';
-  static const String comment = 'comment';
-}
-
-const String tableVisits = 'visits';

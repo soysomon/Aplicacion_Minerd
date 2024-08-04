@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vibration/vibration.dart';
 import '../providers/visit_provider.dart';
+import '../providers/incident_provider.dart';
 
 class SecurityScreen extends StatefulWidget {
   @override
@@ -48,7 +50,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
     // Delete records and show feedback
     if (_isButtonLongPressed) {
-      _deleteAllRecords(context);
+      _showDeleteDialog(context);
     }
   }
 
@@ -62,11 +64,86 @@ class _SecurityScreenState extends State<SecurityScreen> {
     Vibration.cancel();
   }
 
-  void _deleteAllRecords(BuildContext context) async {
-    await Provider.of<VisitProvider>(context, listen: false).deleteAllVisits();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Todas las visitas han sido eliminadas.'),
-    ));
+  Future<void> _showDeleteDialog(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Token no encontrado. Inicie sesión nuevamente.'),
+      ));
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Eliminar registros'),
+        content: Text('¿Qué desea eliminar?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              _deleteAllVisits(context);
+              Navigator.of(context).pop();
+            },
+            child: Text('Visitas'),
+          ),
+          TextButton(
+            onPressed: () {
+              _deleteAllIncidents(context);
+              Navigator.of(context).pop();
+            },
+            child: Text('Incidencias'),
+          ),
+          TextButton(
+            onPressed: () {
+              _deleteAllVisitsAndIncidents(context);
+              Navigator.of(context).pop();
+            },
+            child: Text('Ambas'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteAllVisits(BuildContext context) async {
+    try {
+      await Provider.of<VisitProvider>(context, listen: false).deleteAllVisits();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Todas las visitas han sido eliminadas.'),
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error al eliminar visitas: $e'),
+      ));
+    }
+  }
+
+  void _deleteAllIncidents(BuildContext context) async {
+    try {
+      await Provider.of<IncidentProvider>(context, listen: false).deleteAllIncidents();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Todas las incidencias han sido eliminadas.'),
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error al eliminar incidencias: $e'),
+      ));
+    }
+  }
+
+  void _deleteAllVisitsAndIncidents(BuildContext context) async {
+    try {
+      await Provider.of<VisitProvider>(context, listen: false).deleteAllVisits();
+      await Provider.of<IncidentProvider>(context, listen: false).deleteAllIncidents();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Todas las visitas e incidencias han sido eliminadas.'),
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error al eliminar visitas e incidencias: $e'),
+      ));
+    }
   }
 
   @override
@@ -87,7 +164,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
           Positioned(
             top: 50,
             child: Text(
-              'Delete all visits',
+              'Delete all records',
               style: TextStyle(
                 fontSize: 24,
                 color: Colors.black,

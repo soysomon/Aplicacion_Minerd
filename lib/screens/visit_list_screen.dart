@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:video_player/video_player.dart';
 import '../providers/visit_provider.dart';
 import 'visit_detail_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class VisitListScreen extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class VisitListScreen extends StatefulWidget {
 class _VisitListScreenState extends State<VisitListScreen> {
   String _searchQuery = '';
   late VideoPlayerController _controller;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -32,6 +34,27 @@ class _VisitListScreenState extends State<VisitListScreen> {
         });
         _controller.play();
       });
+    _fetchVisits();
+  }
+
+  Future<void> _fetchVisits() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token != null) {
+      try {
+        await Provider.of<VisitProvider>(context, listen: false).fetchVisits(token);
+        setState(() {
+          _isLoading = false;
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al cargar visitas: $e')),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -77,77 +100,70 @@ class _VisitListScreenState extends State<VisitListScreen> {
             ),
           ),
           Expanded(
-            child: FutureBuilder(
-              future: Provider.of<VisitProvider>(context, listen: false).fetchVisits(),
-              builder: (ctx, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else {
-                  return Consumer<VisitProvider>(
-                    builder: (ctx, visitProvider, _) {
-                      final visits = visitProvider.visits.where((visit) {
-                        return visit.directorId.contains(_searchQuery);
-                      }).toList();
+            child: _isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Consumer<VisitProvider>(
+              builder: (ctx, visitProvider, _) {
+                final visits = visitProvider.visits.where((visit) {
+                  return visit.directorId.contains(_searchQuery);
+                }).toList();
 
-                      if (visits.isEmpty) {
-                        return Stack(
-                          children: [
-                            if (_controller.value.isInitialized)
-                              Positioned.fill(
-                                child: AspectRatio(
-                                  aspectRatio: _controller.value.aspectRatio,
-                                  child: VideoPlayer(_controller),
-                                ),
-                              ),
-                            Center(child: Text('', style: TextStyle(fontSize: 24, color: Colors.black))),
-                          ],
-                        );
-                      }
-
-                      return ListView(
-                        children: [
-                          if (visits.isNotEmpty)
-                            CarouselSlider.builder(
-                              itemCount: visits.length,
-                              itemBuilder: (context, index, realIndex) {
-                                final visit = visits[index];
-                                if (visit.photoPath.isEmpty) {
-                                  return Container();
-                                } else {
-                                  return Container(
-                                    margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                    child: Image.file(File(visit.photoPath)),
-                                  );
-                                }
-                              },
-                              options: CarouselOptions(
-                                height: 200,
-                                autoPlay: true,
-                                enlargeCenterPage: true,
-                                viewportFraction: 0.8,
-                              ),
-                            ),
-                          ...visits.map((visit) {
-                            return ListTile(
-                              title: Text('Centro: ${visit.centerCode}'),
-                              subtitle: Text('Fecha: ${visit.date}'),
-                              leading: visit.photoPath.isEmpty
-                                  ? null
-                                  : Image.file(File(visit.photoPath)),
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => VisitDetailScreen(visit: visit),
-                                  ),
-                                );
-                              },
-                            );
-                          }).toList(),
-                        ],
-                      );
-                    },
+                if (visits.isEmpty) {
+                  return Stack(
+                    children: [
+                      if (_controller.value.isInitialized)
+                        Positioned.fill(
+                          child: AspectRatio(
+                            aspectRatio: _controller.value.aspectRatio,
+                            child: VideoPlayer(_controller),
+                          ),
+                        ),
+                      Center(child: Text('No hay visitas disponibles', style: TextStyle(fontSize: 24, color: Colors.black))),
+                    ],
                   );
                 }
+
+                return ListView(
+                  children: [
+                    if (visits.isNotEmpty)
+                      CarouselSlider.builder(
+                        itemCount: visits.length,
+                        itemBuilder: (context, index, realIndex) {
+                          final visit = visits[index];
+                          if (visit.photoPath.isEmpty) {
+                            return Container();
+                          } else {
+                            return Container(
+                              margin: EdgeInsets.symmetric(horizontal: 5.0),
+                              child: Image.file(File(visit.photoPath)),
+                            );
+                          }
+                        },
+                        options: CarouselOptions(
+                          height: 200,
+                          autoPlay: true,
+                          enlargeCenterPage: true,
+                          viewportFraction: 0.8,
+                        ),
+                      ),
+                    ...visits.map((visit) {
+                      return ListTile(
+                        title: Text('Centro: ${visit.centerCode}'),
+                        subtitle: Text('Fecha: ${visit.date}'),
+                        leading: visit.photoPath.isEmpty
+                            ? null
+                            : Image.file(File(visit.photoPath)),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => VisitDetailScreen(visit: visit),
+                            ),
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ],
+                );
               },
             ),
           ),

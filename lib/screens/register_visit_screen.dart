@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/visit.dart';
 import '../providers/visit_provider.dart';
 
@@ -141,6 +142,8 @@ class _RegisterVisitScreenState extends State<RegisterVisitScreen> {
         _commentController.text.isEmpty ||
         _selectedDate == null ||
         _selectedTime == null ||
+        _photoPath.isEmpty ||
+        _audioPath.isEmpty ||
         (_latitudeController.text.isEmpty && _longitudeController.text.isEmpty)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Por favor complete todos los campos obligatorios')),
@@ -149,6 +152,7 @@ class _RegisterVisitScreenState extends State<RegisterVisitScreen> {
     }
 
     final visit = Visit(
+      id: 0, // Proporciona un id temporal
       directorId: _directorIdController.text,
       centerCode: _centerCodeController.text,
       reason: _reasonController.text,
@@ -161,8 +165,30 @@ class _RegisterVisitScreenState extends State<RegisterVisitScreen> {
       comment: _commentController.text,
     );
 
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Token no encontrado. Inicie sesión nuevamente.')),
+      );
+      return;
+    }
+
     try {
-      await Provider.of<VisitProvider>(context, listen: false).addVisit(visit);
+      await Provider.of<VisitProvider>(context, listen: false).reportVisit(
+        token: token,
+        cedulaDirector: visit.directorId,
+        codigoCentro: visit.centerCode,
+        motivo: visit.reason,
+        fotoEvidencia: visit.photoPath,
+        comentario: visit.comment,
+        notaVoz: visit.audioPath,
+        latitud: visit.latitude.toString(),
+        longitud: visit.longitude.toString(),
+        fecha: visit.date,
+        hora: visit.time,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Visita guardada exitosamente')),
       );

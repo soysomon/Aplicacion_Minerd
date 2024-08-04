@@ -1,3 +1,7 @@
+// lib/models/incident.dart
+
+import '../database/incident_fields.dart';
+
 class Incident {
   final int? id;
   final String title;
@@ -44,19 +48,7 @@ class Incident {
         audioPath: audioPath ?? this.audioPath,
       );
 
-  static Incident fromJson(Map<String, Object?> json) => Incident(
-    id: json[IncidentFields.id] as int?,
-    title: json[IncidentFields.title] as String,
-    center: json[IncidentFields.center] as String,
-    regional: json[IncidentFields.regional] as String,
-    district: json[IncidentFields.district] as String,
-    date: json[IncidentFields.date] as String,
-    description: json[IncidentFields.description] as String,
-    photoPath: json[IncidentFields.photoPath] as String,
-    audioPath: json[IncidentFields.audioPath] as String,
-  );
-
-  Map<String, Object?> toJson() => {
+  Map<String, dynamic> toJson() => {
     IncidentFields.id: id,
     IncidentFields.title: title,
     IncidentFields.center: center,
@@ -67,22 +59,16 @@ class Incident {
     IncidentFields.photoPath: photoPath,
     IncidentFields.audioPath: audioPath,
   };
+
+  static Incident fromJson(Map<String, dynamic> json) => Incident(
+    id: json[IncidentFields.id] as int?,
+    title: json[IncidentFields.title] as String,
+    center: json[IncidentFields.center] as String,
+    regional: json[IncidentFields.regional] as String,
+    district: json[IncidentFields.district] as String,
+    date: json[IncidentFields.date] as String,
+    description: json[IncidentFields.description] as String,
+    photoPath: json[IncidentFields.photoPath] as String,
+    audioPath: json[IncidentFields.audioPath] as String,
+  );
 }
-
-class IncidentFields {
-  static final List<String> values = [
-    id, title, center, regional, district, date, description, photoPath, audioPath
-  ];
-
-  static const String id = '_id';
-  static const String title = 'title';
-  static const String center = 'center';
-  static const String regional = 'regional';
-  static const String district = 'district';
-  static const String date = 'date';
-  static const String description = 'description';
-  static const String photoPath = 'photoPath';
-  static const String audioPath = 'audioPath';
-}
-
-const String tableIncidents = 'incidents';
