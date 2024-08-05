@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/user_provider.dart';
+import 'horoscope_screen.dart';
 import 'register_incident_screen.dart';
 import 'incident_list_screen.dart';
 import 'register_visit_screen.dart';
@@ -93,6 +94,15 @@ class DrawerMenuScreen extends StatelessWidget {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => NewsScreen()),
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.brightness_4, color: Colors.white),
+            title: Text('Horóscopo', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => HoroscopeScreen()),
               );
             },
           ),
