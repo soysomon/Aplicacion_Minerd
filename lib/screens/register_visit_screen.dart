@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'dart:io';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import '../models/visit.dart';
 import '../providers/visit_provider.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class RegisterVisitScreen extends StatefulWidget {
   @override
@@ -203,116 +205,260 @@ class _RegisterVisitScreenState extends State<RegisterVisitScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFFAFAFA),
       appBar: AppBar(
-        title: Text('Registrar Visita'),
+        backgroundColor: Color(0xFF003876),
+        elevation: 0,
+        title: Text('Registrar Visita', style: GoogleFonts.dmSans(color: Colors.white)),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: _directorIdController,
-              decoration: InputDecoration(labelText: 'Cédula del Director'),
-            ),
-            TextField(
-              controller: _centerCodeController,
-              decoration: InputDecoration(labelText: 'Código del Centro'),
-            ),
-            TextField(
-              controller: _reasonController,
-              decoration: InputDecoration(labelText: 'Motivo de la Visita'),
-            ),
-            TextField(
-              controller: _commentController,
-              decoration: InputDecoration(labelText: 'Comentario'),
-              maxLines: 3,
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Text(
-                  _selectedDate == null
-                      ? 'Seleccione una fecha'
-                      : 'Fecha: ${_selectedDate.toString().split(' ')[0]}',
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Color(0xFF003876),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
                 ),
-                Spacer(),
-                ElevatedButton(
-                  onPressed: _selectDate,
-                  child: Text('Seleccionar Fecha'),
+              ),
+              child: Text(
+                'Completa los detalles de la visita',
+                style: GoogleFonts.dmSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-              ],
+                textAlign: TextAlign.center,
+              ),
             ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Text(
-                  _selectedTime == null
-                      ? 'Seleccione una hora'
-                      : 'Hora: ${_selectedTime!.format(context)}',
-                ),
-                Spacer(),
-                ElevatedButton(
-                  onPressed: _selectTime,
-                  child: Text('Seleccionar Hora'),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _pickImage,
-              child: Text('Tomar Foto'),
-            ),
-            _photoPath.isNotEmpty
-                ? Image.file(File(_photoPath), height: 100, width: 100)
-                : Container(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _latitudeController,
-                    decoration: InputDecoration(labelText: 'Latitud'),
-                    keyboardType: TextInputType.number,
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildTextField(_directorIdController, 'Cédula del Director'),
+                  SizedBox(height: 15),
+                  _buildTextField(_centerCodeController, 'Código del Centro'),
+                  SizedBox(height: 15),
+                  _buildTextField(_reasonController, 'Motivo de la Visita'),
+                  SizedBox(height: 15),
+                  _buildTextField(_commentController, 'Comentario', maxLines: 3),
+                  SizedBox(height: 15),
+                  _buildDatePicker(),
+                  SizedBox(height: 15),
+                  _buildTimePicker(),
+                  SizedBox(height: 15),
+                  _buildImagePicker(),
+                  SizedBox(height: 15),
+                  _buildAudioRecorder(),
+                  SizedBox(height: 15),
+                  _buildLocationPicker(),
+                  SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: _saveVisit,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      child: Text(
+                        'Guardar Visita',
+                        style: GoogleFonts.dmSans(fontSize: 18),
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    controller: _longitudeController,
-                    decoration: InputDecoration(labelText: 'Longitud'),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _getCurrentLocation,
-              child: Text('Obtener Ubicación Actual'),
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: _isRecording ? _stopRecording : _startRecording,
-                  child: Text(_isRecording ? 'Detener Grabación' : 'Grabar Audio'),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    _isRecording ? 'Grabando...' : _audioPath.isNotEmpty ? 'Audio Grabado' : 'Sin Audio',
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _saveVisit,
-              child: Text('Guardar Visita'),
+                ],
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label, {int maxLines = 1}) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: GoogleFonts.dmSans(color: Colors.grey),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Color(0xFF003876)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDatePicker() {
+    return InkWell(
+      onTap: _selectDate,
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: 'Fecha',
+          labelStyle: GoogleFonts.dmSans(color: Colors.grey),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Color(0xFF003876)),
+          ),
+        ),
+        child: Text(
+          _selectedDate != null
+              ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
+              : 'Seleccione una fecha',
+          style: GoogleFonts.dmSans(fontSize: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimePicker() {
+    return InkWell(
+      onTap: _selectTime,
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: 'Hora',
+          labelStyle: GoogleFonts.dmSans(color: Colors.grey),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Color(0xFF003876)),
+          ),
+        ),
+        child: Text(
+          _selectedTime != null
+              ? _selectedTime!.format(context)
+              : 'Seleccione una hora',
+          style: GoogleFonts.dmSans(fontSize: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImagePicker() {
+    return InkWell(
+      onTap: _pickImage,
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: 'Foto de evidencia',
+          labelStyle: GoogleFonts.dmSans(color: Colors.grey),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Color(0xFF003876)),
+          ),
+        ),
+        child: Text(
+          _photoPath.isNotEmpty
+              ? 'Foto seleccionada'
+              : 'Seleccione una foto',
+          style: GoogleFonts.dmSans(fontSize: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAudioRecorder() {
+    return Column(
+      children: [
+        Text(
+          'Nota de voz',
+          style: GoogleFonts.dmSans(fontSize: 16),
+        ),
+        SizedBox(height: 10),
+        Row(
+          children: [
+            ElevatedButton(
+              onPressed: _startRecording,
+              child: Text('Grabar'),
+            ),
+            SizedBox(width: 10),
+            ElevatedButton(
+              onPressed: _stopRecording,
+              child: Text('Detener'),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
+        Text(
+          _audioPath.isNotEmpty
+              ? 'Nota de voz grabada'
+              : 'No se ha grabado una nota de voz',
+          style: GoogleFonts.dmSans(fontSize: 16),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationPicker() {
+    return Column(
+      children: [
+        Text(
+          'Ubicación',
+          style: GoogleFonts.dmSans(fontSize: 16),
+        ),
+        SizedBox(height: 10),
+        Row(
+          children: [
+            ElevatedButton(
+              onPressed: _getCurrentLocation,
+              child: Text('Obtener ubicación'),
+            ),
+            SizedBox(width: 10),
+            Text(
+              _latitudeController.text.isNotEmpty &&
+                      _longitudeController.text.isNotEmpty
+                  ? 'Ubicación obtenida'
+                  : 'No se ha obtenido la ubicación',
+              style: GoogleFonts.dmSans(fontSize: 16),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

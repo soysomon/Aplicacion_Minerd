@@ -3,6 +3,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import '../models/incident.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../providers/incident_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
