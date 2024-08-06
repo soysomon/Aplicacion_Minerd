@@ -50,7 +50,7 @@ class RegistroApi {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to change password');
+      throw Exception('Error al cambiar la clave: ${response.statusCode}');
     }
   }
 

@@ -80,7 +80,7 @@ class SettingsScreen extends StatelessWidget {
               contentPadding: EdgeInsets.zero,
               leading: Icon(Icons.lock, color: Color(0xFF0d427d), size: 25),
               title: Text(
-                'Cambiar contraseña',
+                'Cambiar clave',
                 style: TextStyle(
                   fontSize: 20,
                 ),
