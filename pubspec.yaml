@@ -65,6 +65,8 @@ flutter:
     - assets/images/educacion.png
     - assets/images/prueba.png
     - assets/images/docente.png
+    - assets/images/perfil.png
+    - assets/images/user.png
     - assets/images/logo_remolacha.png
     - assets/videos/delete.mp4
     - assets/videos/list_unfine.mp4

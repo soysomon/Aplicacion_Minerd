@@ -138,7 +138,68 @@ class _RegisterVisitScreenState extends State<RegisterVisitScreen> {
   }
 
   Future<void> _saveVisit() async {
-    // Implementar la lógica para guardar la visita
+    if (_directorIdController.text.isEmpty ||
+        _centerCodeController.text.isEmpty ||
+        _reasonController.text.isEmpty ||
+        _commentController.text.isEmpty ||
+        _selectedDate == null ||
+        _selectedTime == null ||
+        _photoPath.isEmpty ||
+        _audioPath.isEmpty ||
+        (_latitudeController.text.isEmpty && _longitudeController.text.isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Por favor complete todos los campos obligatorios')),
+      );
+      return;
+    }
+
+    final visit = Visit(
+      id: 0, // Proporciona un id temporal
+      directorId: _directorIdController.text,
+      centerCode: _centerCodeController.text,
+      reason: _reasonController.text,
+      photoPath: _photoPath,
+      audioPath: _audioPath,
+      latitude: _latitudeController.text.isNotEmpty ? double.parse(_latitudeController.text) : 0.0,
+      longitude: _longitudeController.text.isNotEmpty ? double.parse(_longitudeController.text) : 0.0,
+      date: _selectedDate.toString(),
+      time: _selectedTime!.format(context),
+      comment: _commentController.text,
+    );
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Token no encontrado. Inicie sesión nuevamente.')),
+      );
+      return;
+    }
+
+    try {
+      await Provider.of<VisitProvider>(context, listen: false).reportVisit(
+        token: token,
+        cedulaDirector: visit.directorId,
+        codigoCentro: visit.centerCode,
+        motivo: visit.reason,
+        fotoEvidencia: visit.photoPath,
+        comentario: visit.comment,
+        notaVoz: visit.audioPath,
+        latitud: visit.latitude.toString(),
+        longitud: visit.longitude.toString(),
+        fecha: visit.date,
+        hora: visit.time,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Visita guardada exitosamente')),
+      );
+      Navigator.of(context).pop();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al guardar la visita: $e')),
+      );
+    }
   }
 
   @override
@@ -195,7 +256,7 @@ class _RegisterVisitScreenState extends State<RegisterVisitScreen> {
                     SizedBox(height: 15),
                     _buildAudioRecorder(),
                     SizedBox(height: 15),
-                    _buildLocationPicker(),
+                    _buildLocationFields(), // Actualización aquí
                     SizedBox(height: 30),
                     ElevatedButton(
                       onPressed: _saveVisit,
@@ -203,7 +264,7 @@ class _RegisterVisitScreenState extends State<RegisterVisitScreen> {
                         padding: EdgeInsets.symmetric(vertical: 15),
                         child: Text(
                           'Guardar Visita',
-                          style: GoogleFonts.dmSans(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.dmSans(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), // Letras blancas
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
@@ -384,8 +445,8 @@ class _RegisterVisitScreenState extends State<RegisterVisitScreen> {
             children: [
               ElevatedButton.icon(
                 onPressed: _isRecording ? null : _startRecording,
-                icon: Icon(Icons.mic),
-                label: Text('Grabar'),
+                icon: Icon(Icons.mic, color: Colors.white),
+                label: Text('Grabar', style: GoogleFonts.dmSans(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF003876),
                   shape: RoundedRectangleBorder(
@@ -396,8 +457,8 @@ class _RegisterVisitScreenState extends State<RegisterVisitScreen> {
               SizedBox(width: 10),
               ElevatedButton.icon(
                 onPressed: _isRecording ? _stopRecording : null,
-                icon: Icon(Icons.stop),
-                label: Text('Detener'),
+                icon: Icon(Icons.stop, color: Colors.white),
+                label: Text('Detener', style: GoogleFonts.dmSans(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   shape: RoundedRectangleBorder(
@@ -419,57 +480,35 @@ class _RegisterVisitScreenState extends State<RegisterVisitScreen> {
     );
   }
 
-  Widget _buildLocationPicker() {
-    return Container(
-      padding: EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Ubicación',
-            style: GoogleFonts.dmSans(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10),
-          Row(
-            children: [
-              ElevatedButton.icon(
-                onPressed: _getCurrentLocation,
-                icon: Icon(Icons.location_on),
-                label: Text('Obtener ubicación'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF003876),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+  Widget _buildLocationFields() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Ubicación',
+          style: GoogleFonts.dmSans(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        Row(
+          children: [
+            ElevatedButton.icon(
+              onPressed: _getCurrentLocation,
+              icon: Icon(Icons.location_on, color: Colors.white),
+              label: Text('Obtener ubicación', style: GoogleFonts.dmSans(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF003876),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  _latitudeController.text.isNotEmpty &&
-                          _longitudeController.text.isNotEmpty
-                      ? 'Ubicación obtenida'
-                      : 'No se ha obtenido la ubicación',
-                  style: GoogleFonts.dmSans(fontSize: 14, color: Colors.grey),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
+        _buildTextField(_latitudeController, 'Latitud', Icons.my_location),
+        SizedBox(height: 10),
+        _buildTextField(_longitudeController, 'Longitud', Icons.my_location),
+      ],
     );
   }
 }

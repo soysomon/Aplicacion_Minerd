@@ -36,7 +36,7 @@ class DrawerMenuScreen extends StatelessWidget {
                         radius: 40,
                         backgroundImage: profileProvider.profileImage.isNotEmpty
                             ? FileImage(File(profileProvider.profileImage))
-                            : AssetImage('assets/images/docente.png')
+                            : AssetImage('assets/images/user.png')
                                 as ImageProvider,
                       ),
                       SizedBox(width: 16.0),

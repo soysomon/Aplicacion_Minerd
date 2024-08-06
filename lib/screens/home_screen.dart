@@ -80,7 +80,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                         child: Center(
                           child: SvgPicture.asset(
-                            '../assets/icons/custom_icon.svg',
+                            'assets/icons/custom_icon.svg',
                             width: 60,
                             height: 60,
                             color: Colors.white,
