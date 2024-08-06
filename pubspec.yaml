@@ -1,11 +1,11 @@
 name: aplicacion_minerd
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.4 <4.0.0'
+  sdk: ">=3.4.4 <4.0.0"
 
 dependencies:
   flutter:
@@ -16,6 +16,7 @@ dependencies:
   font_awesome_flutter: ^10.1.0
   flutter_html: any
 
+  geocoding: ^2.0.0
   latlong2: ^0.8.1
   provider: ^6.1.2
   permission_handler: ^11.3.1
@@ -39,7 +40,6 @@ dependencies:
   flutter_zoom_drawer: ^2.1.0
   flutter_bloc: ^8.0.0
 
-
   auto_size_text: 3.0.0
   cached_network_image: 3.2.1
   flutter_animate: 4.1.1+1
@@ -52,14 +52,7 @@ dependencies:
   dio: ^5.4.0
   retrofit: ^4.0.3
 
-
-
   shared_preferences: ^2.0.6
-
-
-
-
-
 
 dev_dependencies:
   flutter_test:

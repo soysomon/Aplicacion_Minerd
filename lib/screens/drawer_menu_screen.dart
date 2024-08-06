@@ -77,22 +77,22 @@ class DrawerMenuScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.map, color: Colors.white),
-            title:
-                Text('Mapa de Visitas', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => MapScreen()),
-              );
-            },
-          ),
-          ListTile(
             leading: Icon(Icons.list_alt, color: Colors.white),
             title:
                 Text('Lista de Visitas', style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => VisitListScreen()),
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.map, color: Colors.white),
+            title:
+                Text('Mapa de Visitas', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => MapScreen()),
               );
             },
           ),
