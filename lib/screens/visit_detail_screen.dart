@@ -41,7 +41,7 @@ class _VisitDetailScreenState extends State<VisitDetailScreen> {
             .fetchVisitDetails(token, _visit.id.toString());
         setState(() {
           _visit = visitDetails;
-          _errorMessage = null;  // Limpiar mensaje de error si la carga es exitosa
+          _errorMessage = null;
         });
       } catch (e) {
         setState(() {
@@ -69,54 +69,97 @@ class _VisitDetailScreenState extends State<VisitDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detalle de Visita'),
+        title: Text('Detalle de Visita', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.black),
+        elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_visit.photoPath.isNotEmpty)
-              Image.file(File(_visit.photoPath)),
-            SizedBox(height: 10),
-            Text('Cédula del Director: ${_visit.directorId}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            Text('Código del Centro: ${_visit.centerCode}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            Text('Motivo de la Visita: ${_visit.reason}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            Text('Comentario: ${_visit.comment}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            Text('Fecha: ${_visit.date}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            Text('Hora: ${_visit.time}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            Text('Latitud: ${_visit.latitude}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            Text('Longitud: ${_visit.longitude}', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            if (_visit.audioPath.isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Audio:', style: TextStyle(fontSize: 18)),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () => _playAudio(_visit.audioPath),
-                    child: Text('Reproducir Audio'),
+      body: Container(
+        color: Colors.white,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (_visit.photoPath.isNotEmpty)
+                Container(
+                  height: 200,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    image: DecorationImage(
+                      image: FileImage(File(_visit.photoPath)),
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ],
-              ),
-            if (_errorMessage != null) // Mostrar mensaje de error si existe
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Text(
-                  _errorMessage!,
-                  style: TextStyle(color: Colors.red, fontSize: 16),
                 ),
-              ),
-          ],
+              SizedBox(height: 20),
+              _buildDetailRow(Icons.person, 'Cédula del Director', _visit.directorId),
+              _buildDetailRow(Icons.school, 'Código del Centro', _visit.centerCode),
+              _buildDetailRow(Icons.assignment, 'Motivo de la Visita', _visit.reason),
+              _buildDetailRow(Icons.comment, 'Comentario', _visit.comment),
+              _buildDetailRow(Icons.calendar_today, 'Fecha', _visit.date),
+              _buildDetailRow(Icons.access_time, 'Hora', _visit.time),
+              _buildDetailRow(Icons.location_on, 'Latitud', _visit.latitude.toString()),
+              _buildDetailRow(Icons.location_on, 'Longitud', _visit.longitude.toString()),
+              if (_visit.audioPath.isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Audio:', style: TextStyle(fontSize: 18, color: Colors.black)),
+                    SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () => _playAudio(_visit.audioPath),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white, backgroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      ),
+                      child: Text('Reproducir Audio'),
+                    ),
+                  ],
+                ),
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Text(
+                    _errorMessage!,
+                    style: TextStyle(color: Colors.red, fontSize: 16),
+                  ),
+                ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.black),
+          SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

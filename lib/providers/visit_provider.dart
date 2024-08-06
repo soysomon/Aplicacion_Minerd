@@ -38,27 +38,6 @@ class VisitProvider with ChangeNotifier {
     }
   }
 
-  Future<Visit> fetchVisitDetails(String token, String situacionId) async {
-    final url = 'https://adamix.net/minerd/def/situacion.php';
-    try {
-      final response = await http.post(Uri.parse(url), body: {'token': token, 'situacion_id': situacionId});
-
-      if (response.statusCode == 200) {
-        final visitData = json.decode(response.body);
-
-        if (visitData['exito']) {
-          return Visit.fromJson(visitData['datos']);
-        } else {
-          throw Exception('Error: ${visitData['mensaje']}');
-        }
-      } else {
-        throw Exception('Failed to load visit details: ${response.statusCode}');
-      }
-    } catch (error) {
-      throw Exception('Failed to load visit details: $error');
-    }
-  }
-
   Future<void> reportVisit({
     required String token,
     required String cedulaDirector,
@@ -72,10 +51,8 @@ class VisitProvider with ChangeNotifier {
     required String fecha,
     required String hora,
   }) async {
-    final url = 'https://adamix.net/minerd/def/registrar_visita.php';
+    final url = 'https://adamix.net/minerd/minerd/registrar_visita.php';
     try {
-      print('Sending data: {token: $token, cedula_director: $cedulaDirector, codigo_centro: $codigoCentro, motivo: $motivo, foto_evidencia: $fotoEvidencia, comentario: $comentario, nota_voz: $notaVoz, latitud: $latitud, longitud: $longitud, fecha: $fecha, hora: $hora}');
-
       final response = await http.post(
         Uri.parse(url),
         body: {
@@ -93,25 +70,44 @@ class VisitProvider with ChangeNotifier {
         },
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         if (responseData['exito']) {
           notifyListeners();
         } else {
-          throw Exception(responseData['mensaje']);
+          throw Exception('Error: ${responseData['mensaje']}');
         }
       } else {
         throw Exception('Failed to report visit: ${response.statusCode}');
       }
-    } catch (e) {
-      throw Exception('Failed to report visit: $e');
+    } catch (error) {
+      throw Exception('Failed to report visit: $error');
     }
   }
 
-  Future<void> deleteAllVisits() async {
+  Future<Visit> fetchVisitDetails(String token, String situacionId) async {
+    final url = 'https://adamix.net/minerd/def/situacion.php';
+    try {
+      final response = await http.post(Uri.parse(url), body: {'token': token, 'situacion_id': situacionId});
+
+      if (response.statusCode == 200) {
+        final visitData = json.decode(response.body);
+
+        if (visitData['exito']) {
+          return Visit.fromJson(visitData['datos']);
+        } else {
+          throw Exception('Error: ${visitData['mensaje']}');
+        }
+      } else {
+        throw Exception('Failed to fetch visit details: ${response.statusCode}');
+      }
+    } catch (error) {
+      throw Exception('Failed to fetch visit details: $error');
+    }
+  }
+
+
+Future<void> deleteAllVisits() async {
     _visits.clear();
     notifyListeners();
   }

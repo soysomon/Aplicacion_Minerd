@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../models/incident.dart';
 import '../providers/incident_provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,6 +20,7 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
   final _descriptionController = TextEditingController();
   final _searchController = TextEditingController();
   DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
   List<String> _photoPaths = [];
   String _audioPath = '';
   FlutterSoundRecorder? _audioRecorder;
@@ -34,6 +36,7 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
     super.initState();
     _audioRecorder = FlutterSoundRecorder();
     _openAudioSession();
+    _requestPermissions(); // Asegúrate de solicitar permisos al iniciar
     _searchController.addListener(_filterCentros);
   }
 
@@ -55,14 +58,33 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
     await _audioRecorder!.closeRecorder();
   }
 
+  Future<void> _requestPermissions() async {
+    var status = await Permission.microphone.status;
+    if (!status.isGranted) {
+      await Permission.microphone.request();
+    }
+
+    var storageStatus = await Permission.storage.status;
+    if (!storageStatus.isGranted) {
+      await Permission.storage.request();
+    }
+  }
+
   Future<void> _startRecording() async {
-    Directory tempDir = await getTemporaryDirectory();
-    String tempPath = '${tempDir.path}/flutter_sound.aac';
-    await _audioRecorder!.startRecorder(toFile: tempPath);
-    setState(() {
-      _audioPath = tempPath;
-      _isRecording = true;
-    });
+    var status = await Permission.microphone.status;
+    if (status.isGranted) {
+      Directory tempDir = await getTemporaryDirectory();
+      String tempPath = '${tempDir.path}/flutter_sound.aac';
+      await _audioRecorder!.startRecorder(toFile: tempPath);
+      setState(() {
+        _audioPath = tempPath;
+        _isRecording = true;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Permiso de grabación no concedido'),
+      ));
+    }
   }
 
   Future<void> _stopRecording() async {
@@ -83,6 +105,19 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
     if (pickedDate != null) {
       setState(() {
         _selectedDate = pickedDate;
+      });
+    }
+  }
+
+  Future<void> _selectTime() async {
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        _selectedTime = pickedTime;
       });
     }
   }
@@ -143,6 +178,7 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
         _districtController.text.isEmpty ||
         _descriptionController.text.isEmpty ||
         _selectedDate == null ||
+        _selectedTime == null ||
         _photoPaths.isEmpty ||
         _audioPath.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -156,7 +192,7 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
       center: _selectedCentro!.nombre,
       regional: _selectedRegional!,
       district: _districtController.text,
-      date: _selectedDate.toString(),
+      date: '${_selectedDate!.toString().split(' ')[0]} ${_selectedTime!.format(context)}',
       description: _descriptionController.text,
       photoPath: _photoPaths.join(','), // Join multiple photo paths
       audioPath: _audioPath,
@@ -205,100 +241,90 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
                   child: Text('Regional $regional'),
                 );
               }),
-              isExpanded: true,
             ),
-            if (_isLoading)
-              CircularProgressIndicator(),
-            if (!_isLoading && _centros.isNotEmpty)
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButton<Centro>(
-                            hint: Text('Seleccione un centro'),
-                            value: _selectedCentro,
-                            onChanged: (Centro? newValue) {
-                              setState(() {
-                                _selectedCentro = newValue;
-                                _districtController.text = newValue?.distrito ?? '';
-                              });
-                            },
-                            items: _filteredCentros.map((Centro centro) {
-                              return DropdownMenuItem<Centro>(
-                                value: centro,
-                                child: Text(centro.nombre),
-                              );
-                            }).toList(),
-                            isExpanded: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(labelText: 'Buscar Centro Educativo'),
+            ),
+            if (_isLoading) CircularProgressIndicator(),
+            if (!_isLoading)
+              ..._filteredCentros.map((centro) {
+                return ListTile(
+                  title: Text(centro.nombre),
+                  onTap: () {
+                    setState(() {
+                      _selectedCentro = centro;
+                      _searchController.clear();
+                      _filteredCentros = [];
+                    });
+                  },
+                );
+              }).toList(),
+            if (_selectedCentro != null) Text('Centro Seleccionado: ${_selectedCentro!.nombre}'),
             TextField(
               controller: _districtController,
               decoration: InputDecoration(labelText: 'Distrito'),
-              readOnly: true,
             ),
             TextField(
               controller: _descriptionController,
+              maxLines: 5,
               decoration: InputDecoration(labelText: 'Descripción'),
-              maxLines: 3,
             ),
-            SizedBox(height: 10),
             Row(
               children: [
                 Expanded(
-                  child: Text(
-                    _selectedDate == null
-                        ? 'Seleccione una fecha'
-                        : 'Fecha: ${_selectedDate.toString().split(' ')[0]}',
-                  ),
+                  child: Text(_selectedDate == null
+                      ? 'Seleccione una fecha'
+                      : 'Fecha: ${_selectedDate!.toLocal().toString().split(' ')[0]}'),
                 ),
-                ElevatedButton(
+                IconButton(
+                  icon: Icon(Icons.calendar_today),
                   onPressed: _selectDate,
-                  child: Text('Seleccionar Fecha'),
                 ),
               ],
             ),
-            SizedBox(height: 10),
-            Wrap(
-              spacing: 10.0,
-              runSpacing: 10.0,
+            Row(
               children: [
-                ElevatedButton(
-                  onPressed: () => _pickImage(ImageSource.gallery),
-                  child: Text('Seleccionar Foto'),
+                Expanded(
+                  child: Text(_selectedTime == null
+                      ? 'Seleccione una hora'
+                      : 'Hora: ${_selectedTime!.format(context)}'),
                 ),
+                IconButton(
+                  icon: Icon(Icons.access_time),
+                  onPressed: _selectTime,
+                ),
+              ],
+            ),
+            Wrap(
+              children: _photoPaths.map((path) {
+                return Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Image.file(File(path), width: 100, height: 100),
+                );
+              }).toList(),
+            ),
+            Row(
+              children: [
                 ElevatedButton(
                   onPressed: () => _pickImage(ImageSource.camera),
                   child: Text('Tomar Foto'),
                 ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => _pickImage(ImageSource.gallery),
+                  child: Text('Seleccionar Foto'),
+                ),
               ],
             ),
-            SizedBox(height: 10),
-            Wrap(
-              spacing: 10.0,
-              runSpacing: 10.0,
-              children: _photoPaths.map((path) {
-                return Image.file(File(path), height: 100, width: 100);
-              }).toList(),
-            ),
-            SizedBox(height: 10),
             Row(
               children: [
-                ElevatedButton(
-                  onPressed: _isRecording ? _stopRecording : _startRecording,
-                  child: Text(_isRecording ? 'Detener Grabación' : 'Grabar Audio'),
-                ),
-                SizedBox(width: 10),
                 Expanded(
-                  child: Text(_isRecording ? 'Grabando...' : _audioPath.isNotEmpty ? 'Audio Grabado' : 'Sin Audio'),
+                  child: Text(_isRecording ? 'Grabando audio...' : 'Audio ${_audioPath.isEmpty ? '' : 'grabado'}'),
+                ),
+                IconButton(
+                  icon: Icon(_isRecording ? Icons.stop : Icons.mic),
+                  onPressed: _isRecording ? _stopRecording : _startRecording,
                 ),
               ],
             ),
