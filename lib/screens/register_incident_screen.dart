@@ -183,22 +183,21 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
     }
   }
 
-
-@override
-Widget build(BuildContext context) {
-  return ZoomDrawer(
-    controller: _drawerController,
-    menuScreen: DrawerMenuScreen(),
-    mainScreen: _buildMainScreen(),
-    borderRadius: 24.0,
-    showShadow: true,
-    angle: 0.0,
-    backgroundColor: Colors.grey[300] ?? Colors.grey,
-    slideWidth: MediaQuery.of(context).size.width * 0.65,
-    openCurve: Curves.fastOutSlowIn,
-    closeCurve: Curves.bounceIn,
-  );
-}
+  @override
+  Widget build(BuildContext context) {
+    return ZoomDrawer(
+      controller: _drawerController,
+      menuScreen: DrawerMenuScreen(),
+      mainScreen: _buildMainScreen(),
+      borderRadius: 24.0,
+      showShadow: true,
+      angle: 0.0,
+      backgroundColor: Colors.grey[300] ?? Colors.grey,
+      slideWidth: MediaQuery.of(context).size.width * 0.65,
+      openCurve: Curves.fastOutSlowIn,
+      closeCurve: Curves.bounceIn,
+    );
+  }
 
   Widget _buildMainScreen() {
     return Scaffold(
@@ -271,7 +270,10 @@ Widget build(BuildContext context) {
                       padding: EdgeInsets.symmetric(vertical: 15),
                       child: Text(
                         'Guardar Incidencia',
-                        style: GoogleFonts.dmSans(fontSize: 18),
+                        style: GoogleFonts.dmSans(
+                          fontSize: 18,
+                          color: Colors.white, // Esto hará que las letras sean blancas
+                        ),
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -281,6 +283,7 @@ Widget build(BuildContext context) {
                       ),
                     ),
                   ),
+
                 ],
               ),
             ),
@@ -416,8 +419,8 @@ Widget build(BuildContext context) {
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () => _pickImage(ImageSource.gallery),
-                icon: Icon(Icons.photo_library),
-                label: Text('Galería', style: GoogleFonts.dmSans()),
+                icon: Icon(Icons.photo_library, color: Colors.white),
+                label: Text('Galería', style: GoogleFonts.dmSans(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF003876),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -428,8 +431,8 @@ Widget build(BuildContext context) {
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () => _pickImage(ImageSource.camera),
-                icon: Icon(Icons.camera_alt),
-                label: Text('Cámara', style: GoogleFonts.dmSans()),
+                icon: Icon(Icons.camera_alt, color: Colors.white),
+                label: Text('Cámara', style: GoogleFonts.dmSans(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF003876),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -459,8 +462,8 @@ Widget build(BuildContext context) {
         Expanded(
           child: ElevatedButton.icon(
             onPressed: _isRecording ? _stopRecording : _startRecording,
-            icon: Icon(_isRecording ? Icons.stop : Icons.mic),
-            label: Text(_isRecording ? 'Detener' : 'Grabar Audio', style: GoogleFonts.dmSans()),
+            icon: Icon(_isRecording ? Icons.stop : Icons.mic, color: Colors.white),
+            label: Text(_isRecording ? 'Detener' : 'Grabar Audio', style: GoogleFonts.dmSans(color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor: _isRecording ? Colors.red : Color(0xFF003876),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

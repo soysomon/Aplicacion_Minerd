@@ -34,7 +34,7 @@ class DrawerMenuScreen extends StatelessWidget {
                 currentAccountPicture: CircleAvatar(
                   backgroundImage: profileProvider.profileImage.isNotEmpty
                       ? FileImage(File(profileProvider.profileImage))
-                      : AssetImage('assets/images/docente.png') as ImageProvider,
+                      : AssetImage('assets/images/user.png') as ImageProvider,
                 ),
                 decoration: BoxDecoration(
                   color: Color(0xFF0d427d),
