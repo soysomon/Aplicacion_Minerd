@@ -13,6 +13,7 @@ import 'visit_list_screen.dart';
 import 'news_screen.dart';
 import 'settings_screen.dart';
 import 'login_screen.dart';
+import 'weather_screen.dart';
 
 class DrawerMenuScreen extends StatelessWidget {
   @override
@@ -106,27 +107,37 @@ class DrawerMenuScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.brightness_4, color: Colors.white),
-            title: Text('Horóscopo', style: TextStyle(color: Colors.white)),
+              leading: Icon(Icons.brightness_4, color: Colors.white),
+              title: Text('Horóscopo', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                final birthDateStr =
+                    Provider.of<UserProvider>(context, listen: false)
+                        .user
+                        .birthDate;
+                try {
+                  final birthDate = DateTime.parse(birthDateStr);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          HoroscopeScreen(birthDate: birthDate),
+                    ),
+                  );
+                } catch (e) {
+                  print('Error al convertir la fecha de nacimiento: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content:
+                            Text('Formato de fecha de nacimiento inválido')),
+                  );
+                }
+              }),
+          ListTile(
+            leading: Icon(Icons.wb_sunny, color: Colors.white),
+            title: Text('Clima', style: TextStyle(color: Colors.white)),
             onTap: () {
-              final birthDateStr =
-                  Provider.of<UserProvider>(context, listen: false)
-                      .user
-                      .birthDate;
-              try {
-                final birthDate = DateTime.parse(birthDateStr);
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => HoroscopeScreen(birthDate: birthDate),
-                  ),
-                );
-              } catch (e) {
-                print('Error al convertir la fecha de nacimiento: $e');
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: Text('Formato de fecha de nacimiento inválido')),
-                );
-              }
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => WeatherScreen()),
+              );
             },
           ),
           ListTile(
