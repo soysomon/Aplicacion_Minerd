@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'change_password_screen.dart';
 import 'security_screen.dart';
 import 'about_screen.dart';
-import 'home_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override

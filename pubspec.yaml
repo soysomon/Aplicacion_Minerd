@@ -76,7 +76,6 @@ flutter:
     - assets/images/prueba.png
     - assets/images/docente.png
     - assets/images/logo_remolacha.png
-    - assets/audio/
     - assets/videos/delete.mp4
     - assets/videos/list_unfine.mp4
     - assets/icons/custom_icon.svg

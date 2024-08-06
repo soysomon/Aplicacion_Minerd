@@ -8,7 +8,6 @@ import 'providers/visit_provider.dart';
 import 'providers/news_provider.dart';
 import 'providers/profile_provider.dart';
 import 'providers/user_provider.dart';
-import 'providers/registro_api.dart'; // Agregar el proveedor de registro
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart'; // Importar la pantalla de registro

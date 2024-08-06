@@ -9,8 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Importar shared_preferences
 import '../providers/registro_api.dart';
-import 'register_visit_screen.dart'; // Asegúrate de que este archivo exista
-import 'change_password_screen.dart';
 import 'forgot_password_screen.dart'; // Nueva importación
 
 class LoginScreen extends StatefulWidget {
