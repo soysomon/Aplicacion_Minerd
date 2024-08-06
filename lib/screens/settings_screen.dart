@@ -11,31 +11,7 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            'Configuración',
-            style: TextStyle(
-              color: Colors.black,
-            ),
-          ),
-        ),
-        centerTitle: false,
-        leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/custom_icon.svg',
-            width: 40,
-            height: 40,
-          ),
-          onPressed: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => HomeScreen()),
-                  (Route<dynamic> route) => false,
-            );
-          },
-        ),
+        title: Text('Configuración'),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -51,7 +27,8 @@ class SettingsScreen extends StatelessWidget {
                   fontSize: 20,
                 ),
               ),
-              trailing: Icon(Icons.chevron_right, color: Colors.black, size: 30),
+              trailing:
+                  Icon(Icons.chevron_right, color: Colors.black, size: 30),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => SecurityScreen()),
@@ -68,7 +45,8 @@ class SettingsScreen extends StatelessWidget {
                   fontSize: 20,
                 ),
               ),
-              trailing: Icon(Icons.chevron_right, color: Colors.black, size: 30),
+              trailing:
+                  Icon(Icons.chevron_right, color: Colors.black, size: 30),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => AboutScreen()),
@@ -85,10 +63,12 @@ class SettingsScreen extends StatelessWidget {
                   fontSize: 20,
                 ),
               ),
-              trailing: Icon(Icons.chevron_right, color: Colors.black, size: 30),
+              trailing:
+                  Icon(Icons.chevron_right, color: Colors.black, size: 30),
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => ChangePasswordScreen()),
                 );
               },
             ),

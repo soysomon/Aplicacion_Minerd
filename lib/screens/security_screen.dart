@@ -108,7 +108,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
   void _deleteAllVisits(BuildContext context) async {
     try {
-      await Provider.of<VisitProvider>(context, listen: false).deleteAllVisits();
+      await Provider.of<VisitProvider>(context, listen: false)
+          .deleteAllVisits();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Todas las visitas han sido eliminadas.'),
       ));
@@ -121,7 +122,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
   void _deleteAllIncidents(BuildContext context) async {
     try {
-      await Provider.of<IncidentProvider>(context, listen: false).deleteAllIncidents();
+      await Provider.of<IncidentProvider>(context, listen: false)
+          .deleteAllIncidents();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Todas las incidencias han sido eliminadas.'),
       ));
@@ -134,8 +136,10 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
   void _deleteAllVisitsAndIncidents(BuildContext context) async {
     try {
-      await Provider.of<VisitProvider>(context, listen: false).deleteAllVisits();
-      await Provider.of<IncidentProvider>(context, listen: false).deleteAllIncidents();
+      await Provider.of<VisitProvider>(context, listen: false)
+          .deleteAllVisits();
+      await Provider.of<IncidentProvider>(context, listen: false)
+          .deleteAllIncidents();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Todas las visitas e incidencias han sido eliminadas.'),
       ));
@@ -149,6 +153,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Eliminar Registros'),
+      ),
       body: Stack(
         alignment: Alignment.center,
         children: [
@@ -160,18 +167,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
               ),
             )
           else
-            Center(child: CircularProgressIndicator()), // Mostrar un indicador de carga mientras el video se inicializa
-          Positioned(
-            top: 50,
-            child: Text(
-              'Delete all records',
-              style: TextStyle(
-                fontSize: 24,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+            Center(
+                child:
+                    CircularProgressIndicator()), // Mostrar un indicador de carga mientras el video se inicializa
           Positioned(
             bottom: 100,
             child: Transform.scale(
