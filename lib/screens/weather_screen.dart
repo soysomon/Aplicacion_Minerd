@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import '../services/api.dart';
-import 'weathermodel.dart';
+import '../services/api.dart'; // Asegúrate de que esta ruta sea correcta
+import '../screens/weathermodel.dart';
 
 class WeatherScreen extends StatefulWidget {
   @override
@@ -11,27 +11,64 @@ class WeatherScreen extends StatefulWidget {
 class _WeatherScreenState extends State<WeatherScreen> {
   ApiResponse? response;
   bool inProgress = false;
-  String message = "Busque la ubicación para obtener datos meteorológicos";
+  String message =
+      "Busque la ubicación para obtener datos meteorológicos y active la ubicación del dispositivo móvil y vuelva a loguearse en caso de que no le aparezca una ubicación por default, pero sigue funcionando el buscador en caso de no activar la ubicación del movil...";
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocationWeather();
+    _determinePosition().then((position) {
+      if (position != null) {
+        _getCurrentLocationWeather(position);
+      }
+    }).catchError((error) {
+      setState(() {
+        message = error.toString();
+      });
+    });
   }
 
-  Future<void> _getCurrentLocationWeather() async {
+  Future<Position?> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw Exception('Los servicios de ubicación están deshabilitados.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw Exception('Los permisos de ubicación están denegados.');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      throw Exception(
+          'Los permisos de ubicación están permanentemente denegados.');
+    }
+
+    // Obtiene la posición actual usando el método adecuado para tu versión
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+  }
+
+  Future<void> _getCurrentLocationWeather(Position position) async {
     setState(() {
       inProgress = true;
     });
     try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
       response = await WeatherApi()
           .getCurrentWeather("${position.latitude},${position.longitude}");
       message = "";
     } catch (e) {
-      message = "No se pudo obtener el clima ";
-      response = null;
+      setState(() {
+        message = "No se pudo obtener el clima";
+        response = null;
+      });
     } finally {
       setState(() {
         inProgress = false;
@@ -44,7 +81,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('El clima de la zona '),
+          title: Text('El clima de la zona'),
         ),
         body: Container(
           padding: const EdgeInsets.all(16),
@@ -125,9 +162,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  (response?.current?.tempC.toString() ?? "") + " °c",
+                  (response?.current?.tempC.toString() ?? "") + " °C",
                   style: const TextStyle(
-                    fontSize: 60,
+                    fontSize: 50,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -225,7 +262,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
       response = await WeatherApi().getCurrentWeather(location);
     } catch (e) {
       setState(() {
-        message = "No se pudo obtener el clima ";
+        message = "No se pudo obtener el clima";
         response = null;
       });
     } finally {
