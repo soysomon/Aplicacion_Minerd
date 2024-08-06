@@ -14,7 +14,8 @@ class HomeScreen extends StatelessWidget {
       menuScreen: DrawerMenuScreen(),
       mainScreen: Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xFF003876), // Fondo azul oscuro
+          backgroundColor: Colors.transparent,
+          elevation: 0,
           title: Text(
             'Aplicación MINERD',
             style: GoogleFonts.dmSans(
@@ -28,21 +29,22 @@ class HomeScreen extends StatelessWidget {
               'assets/icons/icon-menu.svg',
               width: 25,
               height: 25,
-              color: Colors.white, // Botón de menú blanco
+              color: Colors.white,
             ),
             onPressed: () {
               _drawerController.toggle?.call();
             },
           ),
         ),
+        extendBodyBehindAppBar: true,
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xFF003876), // Azul oscuro
-                Color(0xFF0072CE), // Azul medio
-                Color(0xFF4A90E2), // Azul claro
-                Color(0xFFE9C46A), // Amarillo claro (opcional para contraste)
+                Color(0xFF1A237E), // Azul oscuro profundo
+                Color(0xFF3949AB), // Azul índigo
+                Color(0xFF3F51B5), // Azul primario
+                Color(0xFF5C6BC0), // Azul índigo claro
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -51,68 +53,61 @@ class HomeScreen extends StatelessWidget {
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: Center(
-                      child: SvgPicture.asset(
-                        '../assets/icons/home_icon.svg', // Cambia el archivo del ícono aquí
-                        width: 80,
-                        height: 80,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    '¡Bienvenido!',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF003876),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Nos alegra verte de nuevo. Aquí puedes gestionar todas tus actividades.',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.dmSans(
-                      fontSize: 16,
-                      color: Color(0xFF003876),
-                    ),
-                  ),
-                  SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Acción al presionar el botón
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                      child: Text(
-                        'Ir al Dashboard',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 18,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white,
+              child: Card(
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                color: Colors.white.withOpacity(0.9),
+                child: Padding(
+                  padding: const EdgeInsets.all(30.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF1A237E),
+                          borderRadius: BorderRadius.circular(50),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 10,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: SvgPicture.asset(
+                            '../assets/icons/custom_icon.svg',
+                            width: 60,
+                            height: 60,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                    ),
+                      SizedBox(height: 30),
+                      Text(
+                        '¡Bienvenido!',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A237E),
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      Text(
+                        'Nos alegra verte de nuevo. Aquí puedes gestionar todas tus actividades.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.dmSans(
+                          fontSize: 16,
+                          color: Color(0xFF3949AB),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
