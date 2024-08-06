@@ -3,10 +3,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import '../models/incident.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../providers/incident_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'centro_api.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'drawer_menu_screen.dart';
 
 class RegisterIncidentScreen extends StatefulWidget {
   @override
@@ -29,9 +34,12 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
   String? _selectedRegional;
   bool _isLoading = false;
 
+  late ZoomDrawerController _drawerController;
+
   @override
   void initState() {
     super.initState();
+    _drawerController = ZoomDrawerController();
     _audioRecorder = FlutterSoundRecorder();
     _openAudioSession();
     _searchController.addListener(_filterCentros);
@@ -175,141 +183,299 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+
+@override
+Widget build(BuildContext context) {
+  return ZoomDrawer(
+    controller: _drawerController,
+    menuScreen: DrawerMenuScreen(),
+    mainScreen: _buildMainScreen(),
+    borderRadius: 24.0,
+    showShadow: true,
+    angle: 0.0,
+    backgroundColor: Colors.grey[300] ?? Colors.grey,
+    slideWidth: MediaQuery.of(context).size.width * 0.65,
+    openCurve: Curves.fastOutSlowIn,
+    closeCurve: Curves.bounceIn,
+  );
+}
+
+  Widget _buildMainScreen() {
     return Scaffold(
+      backgroundColor: Color(0xFFFAFAFA),
       appBar: AppBar(
-        title: Text('Registrar Incidencia'),
+        backgroundColor: Color(0xFF003876),
+        elevation: 0,
+        title: Text('Registrar Incidencia', style: GoogleFonts.dmSans(color: Colors.white)),
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/icon-menu.svg',
+            width: 25,
+            height: 25,
+            color: Colors.white, // Esto cambiará el color del SVG a blanco
+          ),
+          onPressed: () {
+            _drawerController.toggle?.call();
+          },
+        ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: _titleController,
-              decoration: InputDecoration(labelText: 'Título'),
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Color(0xFF003876),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                ),
+              ),
+              child: Text(
+                'Completa los detalles de la incidencia',
+                style: GoogleFonts.dmSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
-            DropdownButton<String>(
-              hint: Text('Seleccione una regional'),
-              value: _selectedRegional,
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedRegional = newValue;
-                  _fetchCentros();
-                });
-              },
-              items: List.generate(18, (index) {
-                String regional = (index + 1).toString().padLeft(2, '0');
-                return DropdownMenuItem<String>(
-                  value: regional,
-                  child: Text('Regional $regional'),
-                );
-              }),
-              isExpanded: true,
-            ),
-            if (_isLoading)
-              CircularProgressIndicator(),
-            if (!_isLoading && _centros.isNotEmpty)
-              Column(
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButton<Centro>(
-                            hint: Text('Seleccione un centro'),
-                            value: _selectedCentro,
-                            onChanged: (Centro? newValue) {
-                              setState(() {
-                                _selectedCentro = newValue;
-                                _districtController.text = newValue?.distrito ?? '';
-                              });
-                            },
-                            items: _filteredCentros.map((Centro centro) {
-                              return DropdownMenuItem<Centro>(
-                                value: centro,
-                                child: Text(centro.nombre),
-                              );
-                            }).toList(),
-                            isExpanded: true,
-                          ),
-                        ),
-                      ],
+                  _buildTextField(_titleController, 'Título'),
+                  SizedBox(height: 15),
+                  _buildDropdownButton(),
+                  SizedBox(height: 15),
+                  if (_isLoading)
+                    CircularProgressIndicator()
+                  else if (!_isLoading && _centros.isNotEmpty)
+                    _buildCentroDropdown(),
+                  SizedBox(height: 15),
+                  _buildTextField(_districtController, 'Distrito', readOnly: true),
+                  SizedBox(height: 15),
+                  _buildTextField(_descriptionController, 'Descripción', maxLines: 3),
+                  SizedBox(height: 15),
+                  _buildDatePicker(),
+                  SizedBox(height: 15),
+                  _buildImagePickers(),
+                  SizedBox(height: 15),
+                  _buildAudioRecorder(),
+                  SizedBox(height: 30),
+                  ElevatedButton(
+                    onPressed: _saveIncident,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      child: Text(
+                        'Guardar Incidencia',
+                        style: GoogleFonts.dmSans(fontSize: 18),
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                 ],
               ),
-            TextField(
-              controller: _districtController,
-              decoration: InputDecoration(labelText: 'Distrito'),
-              readOnly: true,
-            ),
-            TextField(
-              controller: _descriptionController,
-              decoration: InputDecoration(labelText: 'Descripción'),
-              maxLines: 3,
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    _selectedDate == null
-                        ? 'Seleccione una fecha'
-                        : 'Fecha: ${_selectedDate.toString().split(' ')[0]}',
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: _selectDate,
-                  child: Text('Seleccionar Fecha'),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Wrap(
-              spacing: 10.0,
-              runSpacing: 10.0,
-              children: [
-                ElevatedButton(
-                  onPressed: () => _pickImage(ImageSource.gallery),
-                  child: Text('Seleccionar Foto'),
-                ),
-                ElevatedButton(
-                  onPressed: () => _pickImage(ImageSource.camera),
-                  child: Text('Tomar Foto'),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Wrap(
-              spacing: 10.0,
-              runSpacing: 10.0,
-              children: _photoPaths.map((path) {
-                return Image.file(File(path), height: 100, width: 100);
-              }).toList(),
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: _isRecording ? _stopRecording : _startRecording,
-                  child: Text(_isRecording ? 'Detener Grabación' : 'Grabar Audio'),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(_isRecording ? 'Grabando...' : _audioPath.isNotEmpty ? 'Audio Grabado' : 'Sin Audio'),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _saveIncident,
-              child: Text('Guardar Incidencia'),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label, {bool readOnly = false, int maxLines = 1}) {
+    return TextField(
+      controller: controller,
+      readOnly: readOnly,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: GoogleFonts.dmSans(color: Colors.grey),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Color(0xFF003876)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdownButton() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: DropdownButton<String>(
+        hint: Text('Seleccione una regional', style: GoogleFonts.dmSans()),
+        value: _selectedRegional,
+        onChanged: (String? newValue) {
+          setState(() {
+            _selectedRegional = newValue;
+            _fetchCentros();
+          });
+        },
+        items: List.generate(18, (index) {
+          String regional = (index + 1).toString().padLeft(2, '0');
+          return DropdownMenuItem<String>(
+            value: regional,
+            child: Text('Regional $regional', style: GoogleFonts.dmSans()),
+          );
+        }),
+        isExpanded: true,
+        underline: SizedBox(),
+      ),
+    );
+  }
+
+  Widget _buildCentroDropdown() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: DropdownButton<Centro>(
+        hint: Text('Seleccione un centro', style: GoogleFonts.dmSans()),
+        value: _selectedCentro,
+        onChanged: (Centro? newValue) {
+          setState(() {
+            _selectedCentro = newValue;
+            _districtController.text = newValue?.distrito ?? '';
+          });
+        },
+        items: _filteredCentros.map((Centro centro) {
+          return DropdownMenuItem<Centro>(
+            value: centro,
+            child: Text(centro.nombre, style: GoogleFonts.dmSans()),
+          );
+        }).toList(),
+        isExpanded: true,
+        underline: SizedBox(),
+      ),
+    );
+  }
+
+  Widget _buildDatePicker() {
+    return InkWell(
+      onTap: _selectDate,
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: 'Fecha',
+          labelStyle: GoogleFonts.dmSans(color: Colors.grey),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              _selectedDate == null ? 'Seleccione una fecha' : '${_selectedDate!.toLocal()}'.split(' ')[0],
+              style: GoogleFonts.dmSans(),
+            ),
+            Icon(Icons.calendar_today, color: Color(0xFF003876)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImagePickers() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () => _pickImage(ImageSource.gallery),
+                icon: Icon(Icons.photo_library),
+                label: Text('Galería', style: GoogleFonts.dmSans()),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF003876),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () => _pickImage(ImageSource.camera),
+                icon: Icon(Icons.camera_alt),
+                label: Text('Cámara', style: GoogleFonts.dmSans()),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF003876),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: _photoPaths.map((path) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.file(File(path), height: 80, width: 80, fit: BoxFit.cover),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAudioRecorder() {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: _isRecording ? _stopRecording : _startRecording,
+            icon: Icon(_isRecording ? Icons.stop : Icons.mic),
+            label: Text(_isRecording ? 'Detener' : 'Grabar Audio', style: GoogleFonts.dmSans()),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _isRecording ? Colors.red : Color(0xFF003876),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+        ),
+        SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            _isRecording ? 'Grabando...' : _audioPath.isNotEmpty ? 'Audio Grabado' : 'Sin Audio',
+            style: GoogleFonts.dmSans(color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
     );
   }
 }
