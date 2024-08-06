@@ -2,6 +2,7 @@ import 'package:aplicacion_minerd/providers/registro_api.dart';
 import 'package:aplicacion_minerd/screens/forgot_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'providers/horoscope_provider.dart';
 import 'providers/incident_provider.dart';
 import 'providers/visit_provider.dart';
 import 'providers/news_provider.dart';
@@ -22,8 +23,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => IncidentProvider()),
+        ChangeNotifierProvider(create: (_) => HoroscopeProvider()),
         Provider(create: (_) => RegistroApi()), // Proveedor de registro
-
       ],
       child: MyApp(),
     ),
@@ -44,7 +45,6 @@ class MyApp extends StatelessWidget {
         '/home': (context) => HomeScreen(),
         '/register': (context) => RegisterScreen(),
         '/forgot-password': (context) => ForgotPasswordScreen(),
-
         '/change-password': (context) => ChangePasswordScreen(),
       },
     );

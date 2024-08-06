@@ -35,7 +35,8 @@ class DrawerMenuScreen extends StatelessWidget {
                 currentAccountPicture: CircleAvatar(
                   backgroundImage: profileProvider.profileImage.isNotEmpty
                       ? FileImage(File(profileProvider.profileImage))
-                      : AssetImage('assets/images/docente.png') as ImageProvider,
+                      : AssetImage('assets/images/docente.png')
+                          as ImageProvider,
                 ),
                 decoration: BoxDecoration(
                   color: Color(0xFF0d427d),
@@ -45,16 +46,19 @@ class DrawerMenuScreen extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.add, color: Colors.white),
-            title: Text('Agregar Incidencia', style: TextStyle(color: Colors.white)),
+            title: Text('Agregar Incidencia',
+                style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => RegisterIncidentScreen()),
+                MaterialPageRoute(
+                    builder: (context) => RegisterIncidentScreen()),
               );
             },
           ),
           ListTile(
             leading: Icon(Icons.list, color: Colors.white),
-            title: Text('Lista de Incidencias', style: TextStyle(color: Colors.white)),
+            title: Text('Lista de Incidencias',
+                style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => IncidentListScreen()),
@@ -63,7 +67,8 @@ class DrawerMenuScreen extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.school, color: Colors.white),
-            title: Text('Registrar Visita', style: TextStyle(color: Colors.white)),
+            title:
+                Text('Registrar Visita', style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => RegisterVisitScreen()),
@@ -72,7 +77,8 @@ class DrawerMenuScreen extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.map, color: Colors.white),
-            title: Text('Mapa de Visitas', style: TextStyle(color: Colors.white)),
+            title:
+                Text('Mapa de Visitas', style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => MapScreen()),
@@ -81,7 +87,8 @@ class DrawerMenuScreen extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.list_alt, color: Colors.white),
-            title: Text('Lista de Visitas', style: TextStyle(color: Colors.white)),
+            title:
+                Text('Lista de Visitas', style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => VisitListScreen()),
@@ -102,7 +109,8 @@ class DrawerMenuScreen extends StatelessWidget {
             title: Text('Horóscopo', style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => HoroscopeScreen()),
+                MaterialPageRoute(
+                    builder: (context) => HoroscopeScreen(sign: 'cancer')),
               );
             },
           ),
@@ -122,7 +130,6 @@ class DrawerMenuScreen extends StatelessWidget {
               );
             },
           ),
-
           ListTile(
             leading: Icon(Icons.logout, color: Colors.white),
             title: Text('Logout', style: TextStyle(color: Colors.white)),
