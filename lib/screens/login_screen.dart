@@ -306,22 +306,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                             },
                             child: Text(
-                              "¿No tiene cuenta? Regístrese",
-                              style: GoogleFonts.poppins(
-                                color: Colors.black,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
-                              );
-                            },
-                            child: Text(
-                              "¿Ha olvidado su contraseña? Cámbiela aquí",
+                              "¿No tiene cuenta? Regístrese aquí",
                               style: GoogleFonts.poppins(
                                 color: Colors.black,
                                 decoration: TextDecoration.underline,
