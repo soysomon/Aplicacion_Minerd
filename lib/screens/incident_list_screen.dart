@@ -29,71 +29,99 @@ class _IncidentListScreenState extends State<IncidentListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Lista de Incidencias'),
+        backgroundColor: Colors.white, // Fondo blanco
+        iconTheme: IconThemeData(
+          color: Colors.black, // Color de los iconos en negro
+        ),
+        title: Text(
+          '',
+          style: TextStyle(color: Colors.black), // Color del texto en negro
+        ),
+        elevation: 0, // Elimina la sombra para un diseño más plano
       ),
-      body: FutureBuilder<List<Incident>>(
-        future: _incidentsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error al cargar las incidencias'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No hay incidencias registradas'));
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final incident = snapshot.data![index];
-                return ListTile(
-                  title: Text(incident.title),
-                  subtitle: Text('${incident.date} - ${incident.center}'),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => IncidentDetailScreen(incident: incident),
-                      ),
-                    );
-                  },
-                );
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Incidencias Registradas',
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Buscar por Cédula del Director',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            TextField(
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                hintText: 'Buscar',
+                hintStyle: TextStyle(color: Colors.grey),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  // Implementar la lógica de búsqueda aquí si es necesario
+                });
               },
-            );
-          }
-        },
+            ),
+            SizedBox(height: 16),
+            Expanded(
+              child: FutureBuilder<List<Incident>>(
+                future: _incidentsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error al cargar las incidencias'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No hay incidencias registradas'));
+                  } else {
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final incident = snapshot.data![index];
+                        return Container(
+                          margin: EdgeInsets.symmetric(vertical: 10.0),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ListTile(
+                            title: Text(
+                              incident.title,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text('${incident.date} - ${incident.center}'),
+                            leading: Icon(Icons.location_city, color: Colors.blue),
+                            trailing: Icon(Icons.arrow_forward, color: Colors.blue),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => IncidentDetailScreen(incident: incident),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
       ),
-      floatingActionButton: FanFloatingMenu(
-        menuItems: [
-          FanMenuItem(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => RegisterVisitScreen()),
-              );
-            },
-            icon: Icons.person_add_alt_1_rounded,
-            title: 'Registrar Visita',
-          ),
-          FanMenuItem(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => RegisterIncidentScreen()),
-              );
-            },
-            icon: Icons.add_alert_rounded,
-            title: 'Registrar Incidencia',
-          ),
-          FanMenuItem(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => IncidentListScreen()),
-              );
-            },
-            icon: Icons.list_alt_rounded,
-            title: 'Lista de Incidencias',
-          ),
-        ],
-      ),
+
     );
   }
 }

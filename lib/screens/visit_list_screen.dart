@@ -68,7 +68,11 @@ class _VisitListScreenState extends State<VisitListScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Lista de Visitas'),
+        backgroundColor: Colors.white, // Fondo blanco
+        iconTheme: IconThemeData(
+          color: Colors.black, // Color de los iconos en negro
+        ),
+
         leading: IconButton(
           icon: Icon(Icons.home),
           onPressed: () {
@@ -76,13 +80,22 @@ class _VisitListScreenState extends State<VisitListScreen> {
           },
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Visitas Registradas',
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Buscar por Cédula del Director',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            TextField(
               decoration: InputDecoration(
-                labelText: 'Buscar por Cédula del Director',
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
@@ -98,76 +111,72 @@ class _VisitListScreenState extends State<VisitListScreen> {
                 });
               },
             ),
-          ),
-          Expanded(
-            child: _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : Consumer<VisitProvider>(
-              builder: (ctx, visitProvider, _) {
-                final visits = visitProvider.visits.where((visit) {
-                  return visit.directorId.contains(_searchQuery);
-                }).toList();
+            SizedBox(height: 16),
+            Expanded(
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : Consumer<VisitProvider>(
+                builder: (ctx, visitProvider, _) {
+                  final visits = visitProvider.visits.where((visit) {
+                    return visit.directorId.contains(_searchQuery);
+                  }).toList();
 
-                if (visits.isEmpty) {
-                  return Stack(
-                    children: [
-                      if (_controller.value.isInitialized)
-                        Positioned.fill(
-                          child: AspectRatio(
-                            aspectRatio: _controller.value.aspectRatio,
-                            child: VideoPlayer(_controller),
+                  if (visits.isEmpty) {
+                    return Stack(
+                      children: [
+                        if (_controller.value.isInitialized)
+                          Positioned.fill(
+                            child: AspectRatio(
+                              aspectRatio: _controller.value.aspectRatio,
+                              child: VideoPlayer(_controller),
+                            ),
+                          ),
+                        Center(
+                          child: Text(
+                            'No hay visitas disponibles',
+                            style: TextStyle(fontSize: 24, color: Colors.black),
                           ),
                         ),
-                      Center(child: Text('No hay visitas disponibles', style: TextStyle(fontSize: 24, color: Colors.black))),
-                    ],
-                  );
-                }
+                      ],
+                    );
+                  }
 
-                return ListView(
-                  children: [
-                    if (visits.isNotEmpty)
-                      CarouselSlider.builder(
-                        itemCount: visits.length,
-                        itemBuilder: (context, index, realIndex) {
-                          final visit = visits[index];
-                          if (visit.photoPath.isEmpty) {
-                            return Container();
-                          } else {
-                            return Container(
-                              margin: EdgeInsets.symmetric(horizontal: 5.0),
-                              child: Image.file(File(visit.photoPath)),
-                            );
-                          }
-                        },
-                        options: CarouselOptions(
-                          height: 200,
-                          autoPlay: true,
-                          enlargeCenterPage: true,
-                          viewportFraction: 0.8,
+                  return ListView.builder(
+                    itemCount: visits.length,
+                    itemBuilder: (context, index) {
+                      final visit = visits[index];
+                      return Container(
+                        margin: EdgeInsets.symmetric(vertical: 10.0),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ),
-                    ...visits.map((visit) {
-                      return ListTile(
-                        title: Text('Centro: ${visit.centerCode}'),
-                        subtitle: Text('Fecha: ${visit.date}'),
-                        leading: visit.photoPath.isEmpty
-                            ? null
-                            : Image.file(File(visit.photoPath)),
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => VisitDetailScreen(visit: visit),
-                            ),
-                          );
-                        },
+                        child: ListTile(
+                          title: Text(
+                            'Centro: ${visit.centerCode}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text('Fecha: ${visit.date}'),
+                          leading: visit.photoPath.isEmpty
+                              ? Icon(Icons.location_city, color: Colors.blue)
+                              : Image.file(File(visit.photoPath)),
+                          trailing: Icon(Icons.arrow_forward, color: Colors.blue),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => VisitDetailScreen(visit: visit),
+                              ),
+                            );
+                          },
+                        ),
                       );
-                    }).toList(),
-                  ],
-                );
-              },
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
