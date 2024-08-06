@@ -23,7 +23,6 @@ void main() {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => IncidentProvider()),
         Provider(create: (_) => RegistroApi()), // Proveedor de registro
-
       ],
       child: MyApp(),
     ),
@@ -34,6 +33,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Aplicación MINERD',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -44,7 +44,6 @@ class MyApp extends StatelessWidget {
         '/home': (context) => HomeScreen(),
         '/register': (context) => RegisterScreen(),
         '/forgot-password': (context) => ForgotPasswordScreen(),
-
         '/change-password': (context) => ChangePasswordScreen(),
       },
     );
