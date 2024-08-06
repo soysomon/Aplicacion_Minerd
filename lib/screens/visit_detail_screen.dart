@@ -37,8 +37,9 @@ class _VisitDetailScreenState extends State<VisitDetailScreen> {
     final token = prefs.getString('token');
     if (token != null) {
       try {
-        final visitDetails = await Provider.of<VisitProvider>(context, listen: false)
-            .fetchVisitDetails(token, _visit.id.toString());
+        final visitDetails =
+            await Provider.of<VisitProvider>(context, listen: false)
+                .fetchVisitDetails(token, _visit.id.toString());
         setState(() {
           _visit = visitDetails;
           _errorMessage = null;
@@ -94,30 +95,39 @@ class _VisitDetailScreenState extends State<VisitDetailScreen> {
                   ),
                 ),
               SizedBox(height: 20),
-              _buildDetailRow(Icons.person, 'Cédula del Director', _visit.directorId),
-              _buildDetailRow(Icons.school, 'Código del Centro', _visit.centerCode),
-              _buildDetailRow(Icons.assignment, 'Motivo de la Visita', _visit.reason),
+              _buildDetailRow(
+                  Icons.person, 'Cédula del Director', _visit.directorId),
+              _buildDetailRow(
+                  Icons.school, 'Código del Centro', _visit.centerCode),
+              _buildDetailRow(
+                  Icons.assignment, 'Motivo de la Visita', _visit.reason),
               _buildDetailRow(Icons.comment, 'Comentario', _visit.comment),
               _buildDetailRow(Icons.calendar_today, 'Fecha', _visit.date),
               _buildDetailRow(Icons.access_time, 'Hora', _visit.time),
-              _buildDetailRow(Icons.location_on, 'Latitud', _visit.latitude.toString()),
-              _buildDetailRow(Icons.location_on, 'Longitud', _visit.longitude.toString()),
+              _buildDetailRow(
+                  Icons.location_on, 'Latitud', _visit.latitude.toString()),
+              _buildDetailRow(
+                  Icons.location_on, 'Longitud', _visit.longitude.toString()),
               if (_visit.audioPath.isNotEmpty)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Audio:', style: TextStyle(fontSize: 18, color: Colors.black)),
+                    Text('Audio:',
+                        style: TextStyle(fontSize: 18, color: Colors.black)),
                     SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: () => _playAudio(_visit.audioPath),
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white, backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
-                      child: Text('Reproducir Audio'),
+                      child: Text('Reproducir Audio',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -149,13 +159,14 @@ class _VisitDetailScreenState extends State<VisitDetailScreen> {
               children: [
                 Text(
                   title,
-                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 4),
-                Text(
-                  value,
-                  style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
-                ),
+                Text(value,
+                    style: TextStyle(fontSize: 18, color: Colors.grey[600])),
               ],
             ),
           ),
