@@ -1,38 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
 
-
-//Esta vista es un ejemplo... Hay que trabajarla
 class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).user;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(
-          'Acerca de',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        title: Text('Información del Técnico'),
       ),
       body: Center(
-        child: Text(
-          'Pantalla Acerca de',
-          style: TextStyle(
-            fontSize: 18,
-            color: Colors.black,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(
+                  radius: 60,
+                  backgroundImage: AssetImage('assets/images/docente.png'),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  '${user.name} ${user.lastName}',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.email, color: Color(0xFF0d427d)),
+                    SizedBox(width: 10),
+                    Text(
+                      user.email,
+                      style: TextStyle(fontSize: 16, color: Colors.black87),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.phone, color: Color(0xFF0d427d)),
+                    SizedBox(width: 10),
+                    Text(
+                      user.phone,
+                      style: TextStyle(fontSize: 16, color: Colors.black87),
+                    ),
+                  ],
+                ),
+                Divider(height: 40, thickness: 1.5, color: Color(0xFF0d427d)),
+                Text(
+                  'Reflexión',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  '“La educación es el arma más poderosa que puedes usar para cambiar el mundo.” - Nelson Mandela',
+                  style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black87),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
+

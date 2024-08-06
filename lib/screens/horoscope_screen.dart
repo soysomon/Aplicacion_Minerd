@@ -59,7 +59,7 @@ class HoroscopeScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0d427d),
+                        color: Colors.black87,
                       ),
                     ),
                     SizedBox(height: 10),

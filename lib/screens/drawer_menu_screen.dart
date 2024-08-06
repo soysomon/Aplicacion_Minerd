@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/user_provider.dart';
+import 'about_screen.dart';
 import 'horoscope_screen.dart';
 import 'register_incident_screen.dart';
 import 'incident_list_screen.dart';
@@ -132,7 +133,9 @@ class DrawerMenuScreen extends StatelessWidget {
             leading: Icon(Icons.info, color: Colors.white),
             title: Text('Acerca de', style: TextStyle(color: Colors.white)),
             onTap: () {
-              // Implementar navegación
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => AboutScreen()),
+              );
             },
           ),
           ListTile(
