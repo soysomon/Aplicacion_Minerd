@@ -3,36 +3,31 @@ import 'package:provider/provider.dart';
 import '../providers/horoscope_provider.dart';
 
 class HoroscopeScreen extends StatelessWidget {
-  final String sign;
+  final DateTime birthDate;
 
-  HoroscopeScreen({required this.sign});
+  HoroscopeScreen({required this.birthDate});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => HoroscopeProvider()..fetchHoroscope(sign),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Horóscopo del Día'),
-        ),
-        body: Consumer<HoroscopeProvider>(
-          builder: (context, horoscopeProvider, child) {
-            if (horoscopeProvider.isLoading) {
-              return Center(child: CircularProgressIndicator());
-            } else {
-              return Center(
-                child: Text(
-                  horoscopeProvider.horoscope.isNotEmpty
-                      ? horoscopeProvider.horoscope
-                      : 'Error al cargar el horóscopo.',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              );
-            }
-          },
+    final horoscopeProvider = Provider.of<HoroscopeProvider>(context);
+
+    // Establecer la fecha de nacimiento para obtener el signo y el horóscopo
+    horoscopeProvider.setBirthDate(birthDate);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Horóscopo'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text('Signo: ${horoscopeProvider.zodiacSign}',
+                style: TextStyle(fontSize: 24)),
+            SizedBox(height: 20),
+            Text('Horóscopo: ${horoscopeProvider.horoscope}',
+                style: TextStyle(fontSize: 18)),
+          ],
         ),
       ),
     );

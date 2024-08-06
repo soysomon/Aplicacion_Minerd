@@ -108,10 +108,24 @@ class DrawerMenuScreen extends StatelessWidget {
             leading: Icon(Icons.brightness_4, color: Colors.white),
             title: Text('Horóscopo', style: TextStyle(color: Colors.white)),
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (context) => HoroscopeScreen(sign: 'cancer')),
-              );
+              final birthDateStr =
+                  Provider.of<UserProvider>(context, listen: false)
+                      .user
+                      .birthDate;
+              try {
+                final birthDate = DateTime.parse(birthDateStr);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => HoroscopeScreen(birthDate: birthDate),
+                  ),
+                );
+              } catch (e) {
+                print('Error al convertir la fecha de nacimiento: $e');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text('Formato de fecha de nacimiento inválido')),
+                );
+              }
             },
           ),
           ListTile(
