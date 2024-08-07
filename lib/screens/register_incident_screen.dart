@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_sound/flutter_sound.dart';
-import '../models/incident.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../providers/incident_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'centro_api.dart';
@@ -12,6 +10,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'drawer_menu_screen.dart';
+import '../models/incident.dart';
+import '../providers/incident_provider.dart';
 
 class RegisterIncidentScreen extends StatefulWidget {
   @override
@@ -33,7 +33,6 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
   Centro? _selectedCentro;
   String? _selectedRegional;
   bool _isLoading = false;
-
   late ZoomDrawerController _drawerController;
 
   @override
@@ -41,7 +40,7 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
     super.initState();
     _drawerController = ZoomDrawerController();
     _audioRecorder = FlutterSoundRecorder();
-    _openAudioSession();
+    _initializeRecorder();
     _searchController.addListener(_filterCentros);
   }
 
@@ -51,33 +50,50 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
     _districtController.dispose();
     _descriptionController.dispose();
     _searchController.dispose();
-    _closeAudioSession();
+    _audioRecorder?.closeRecorder();
     super.dispose();
   }
 
-  Future<void> _openAudioSession() async {
+  Future<void> _initializeRecorder() async {
+    await _requestPermissions();
     await _audioRecorder!.openRecorder();
+    setState(() {});
   }
 
-  Future<void> _closeAudioSession() async {
-    await _audioRecorder!.closeRecorder();
+  Future<void> _requestPermissions() async {
+    var status = await Permission.microphone.request();
+    if (status.isDenied || status.isPermanentlyDenied) {
+      await openAppSettings();
+    }
+    await Permission.storage.request();
   }
 
   Future<void> _startRecording() async {
-    Directory tempDir = await getTemporaryDirectory();
-    String tempPath = '${tempDir.path}/flutter_sound.aac';
-    await _audioRecorder!.startRecorder(toFile: tempPath);
-    setState(() {
-      _audioPath = tempPath;
-      _isRecording = true;
-    });
+    if (_audioRecorder != null && !_audioRecorder!.isRecording) {
+      if (await Permission.microphone.isGranted && await Permission.storage.isGranted) {
+        Directory tempDir = await getTemporaryDirectory();
+        String tempPath = '${tempDir.path}/flutter_sound.aac';
+        await _audioRecorder!.startRecorder(
+          toFile: tempPath,
+          codec: Codec.aacADTS,
+        );
+        setState(() {
+          _audioPath = tempPath;
+          _isRecording = true;
+        });
+      } else {
+        await _requestPermissions();
+      }
+    }
   }
 
   Future<void> _stopRecording() async {
-    await _audioRecorder!.stopRecorder();
-    setState(() {
-      _isRecording = false;
-    });
+    if (_audioRecorder != null && _audioRecorder!.isRecording) {
+      await _audioRecorder!.stopRecorder();
+      setState(() {
+        _isRecording = false;
+      });
+    }
   }
 
   Future<void> _selectDate() async {
@@ -230,15 +246,6 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
                   bottomRight: Radius.circular(30),
                 ),
               ),
-              child: Text(
-                'Completa los detalles de la incidencia',
-                style: GoogleFonts.dmSans(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
             ),
             Padding(
               padding: EdgeInsets.all(20),
@@ -283,7 +290,6 @@ class _RegisterIncidentScreenState extends State<RegisterIncidentScreen> {
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),

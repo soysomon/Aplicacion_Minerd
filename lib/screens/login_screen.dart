@@ -1,15 +1,16 @@
 import 'package:aplicacion_minerd/screens/register_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/user.dart';
+import '../providers/registro_api.dart';
 import '../providers/user_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Importar shared_preferences
-import '../providers/registro_api.dart';
-import 'forgot_password_screen.dart'; // Nueva importación
+import 'package:flutter/material.dart';
+
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -59,6 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
           phone: datos['telefono'].toString(),
           birthDate: datos['fecha_nacimiento'].toString(),
           token: datos['token'].toString(),
+          profileImageUrl: datos['profileImageUrl'].toString(), // Extraer y establecer la URL de la imagen
         );
 
         Provider.of<UserProvider>(context, listen: false).setUser(user);
@@ -172,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     SizedBox(height: 30),
                     Text(
-                      'Login',
+                      'Iniciar sesión',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.dmSans(
                         fontSize: 32,
@@ -260,7 +262,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: _isLoading
                                     ? CircularProgressIndicator(color: Colors.white)
                                     : Text(
-                                  'Login',
+                                  'Acceder',
                                   style: GoogleFonts.dmSans(
                                     fontSize: 18,
                                     fontWeight: FontWeight.normal,

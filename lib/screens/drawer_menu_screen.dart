@@ -93,7 +93,7 @@ class DrawerMenuScreen extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.map, color: Colors.black), // Ícono negro
-            title: Text('Mapa de Visitas', style: TextStyle(color: Colors.black)), // Texto negro
+            title: Text('Lista de Visitas', style: TextStyle(color: Colors.black)), // Texto negro
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => VisitListScreen()),
@@ -102,7 +102,7 @@ class DrawerMenuScreen extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.list_alt, color: Colors.black), // Ícono negro
-            title: Text('Lista de Visitas', style: TextStyle(color: Colors.black)), // Texto negro
+            title: Text(' Mapa de Visitas', style: TextStyle(color: Colors.black)), // Texto negro
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => MapScreen()),

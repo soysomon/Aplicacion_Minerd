@@ -225,15 +225,7 @@ class _RegisterVisitScreenState extends State<RegisterVisitScreen> {
                     bottomRight: Radius.circular(30),
                   ),
                 ),
-                child: Text(
-                  'Completa los detalles de la visita',
-                  style: GoogleFonts.dmSans(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+
               ),
               Padding(
                 padding: EdgeInsets.all(20),

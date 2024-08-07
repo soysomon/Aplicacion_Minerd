@@ -108,8 +108,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
   void _deleteAllVisits(BuildContext context) async {
     try {
-      await Provider.of<VisitProvider>(context, listen: false)
-          .deleteAllVisits();
+      await Provider.of<VisitProvider>(context, listen: false).deleteAllVisits();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Todas las visitas han sido eliminadas.'),
       ));
@@ -122,8 +121,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
   void _deleteAllIncidents(BuildContext context) async {
     try {
-      await Provider.of<IncidentProvider>(context, listen: false)
-          .deleteAllIncidents();
+      await Provider.of<IncidentProvider>(context, listen: false).deleteAllIncidents();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Todas las incidencias han sido eliminadas.'),
       ));
@@ -136,10 +134,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
   void _deleteAllVisitsAndIncidents(BuildContext context) async {
     try {
-      await Provider.of<VisitProvider>(context, listen: false)
-          .deleteAllVisits();
-      await Provider.of<IncidentProvider>(context, listen: false)
-          .deleteAllIncidents();
+      await Provider.of<VisitProvider>(context, listen: false).deleteAllVisits();
+      await Provider.of<IncidentProvider>(context, listen: false).deleteAllIncidents();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Todas las visitas e incidencias han sido eliminadas.'),
       ));
@@ -167,11 +163,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
               ),
             )
           else
-            Center(
-                child:
-                    CircularProgressIndicator()), // Mostrar un indicador de carga mientras el video se inicializa
+            Center(child: CircularProgressIndicator()), // Mostrar un indicador de carga mientras el video se inicializa
           Positioned(
-            bottom: 100,
+            bottom: 150,
             child: Transform.scale(
               scale: _buttonScale,
               child: GestureDetector(
@@ -200,6 +194,18 @@ class _SecurityScreenState extends State<SecurityScreen> {
                   ),
                 ),
               ),
+            ),
+          ),
+          Positioned(
+            bottom: 50,
+            child: Text(
+              'Pulsar  3 segundos',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
         ],
